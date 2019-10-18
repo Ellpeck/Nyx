@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.List;
+import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = Nyx.ID, value = Side.CLIENT)
 public final class ClientEvents {
@@ -22,12 +23,17 @@ public final class ClientEvents {
     public static void onTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
         List<String> tooltip = event.getToolTip();
-        for (Enchantment enchantment : EnchantmentHelper.getEnchantments(stack).keySet()) {
+        for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
+            Enchantment enchantment = entry.getKey();
             if (!(enchantment instanceof NyxEnchantment))
                 continue;
+            String name = enchantment.getTranslatedName(entry.getValue());
+            int addIndex = tooltip.indexOf(name) + 1;
+
             String info = I18n.format(enchantment.getName() + ".desc");
-            for (String split : Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(info, 200))
-                tooltip.add(TextFormatting.DARK_GRAY + split);
+            List<String> split = Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(info, 200);
+            for (int i = split.size() - 1; i >= 0; i--)
+                tooltip.add(addIndex, TextFormatting.DARK_GRAY + split.get(i));
         }
     }
 }

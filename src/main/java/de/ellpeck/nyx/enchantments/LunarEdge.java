@@ -1,6 +1,8 @@
 package de.ellpeck.nyx.enchantments;
 
 import de.ellpeck.nyx.events.Events;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentDamage;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -23,5 +25,10 @@ public class LunarEdge extends NyxEnchantment {
     @Override
     public int getMaxLevel() {
         return 5;
+    }
+
+    @Override
+    protected boolean canApplyTogether(Enchantment ench) {
+        return super.canApplyTogether(ench) && !(ench instanceof EnchantmentDamage);
     }
 }

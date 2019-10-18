@@ -1,6 +1,8 @@
 package de.ellpeck.nyx.enchantments;
 
 import de.ellpeck.nyx.events.Events;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.DamageSource;
@@ -26,4 +28,10 @@ public class LunarShield extends NyxEnchantment {
     public int getMaxLevel() {
         return 4;
     }
+
+    @Override
+    protected boolean canApplyTogether(Enchantment ench) {
+        return super.canApplyTogether(ench) && !(ench instanceof EnchantmentProtection);
+    }
+
 }
