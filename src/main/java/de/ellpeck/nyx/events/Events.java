@@ -16,6 +16,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -32,7 +33,8 @@ public final class Events {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
-        moonPhase = event.world.getCurrentMoonPhaseFactor();
+        if (event.world.provider.getDimensionType() == DimensionType.OVERWORLD)
+            moonPhase = event.world.getCurrentMoonPhaseFactor();
     }
 
     @SubscribeEvent
