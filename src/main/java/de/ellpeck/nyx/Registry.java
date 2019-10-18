@@ -15,6 +15,7 @@ public final class Registry {
 
     @SubscribeEvent
     public static void onEnchantmentRegistry(RegistryEvent.Register<Enchantment> event) {
-        event.getRegistry().registerAll(LUNAR_EDGE, LUNAR_SHIELD);
+        if (Nyx.enchantments)
+            event.getRegistry().registerAll(LUNAR_EDGE, LUNAR_SHIELD);
     }
 }

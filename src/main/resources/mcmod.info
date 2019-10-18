@@ -1,0 +1,19 @@
+[
+    {
+        "modid": "nyx",
+        "name": "Nyx",
+        "description": "A mod about effects of the moon",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
+        "url": "http://github.com/Ellpeck/Nyx",
+        "updateUrl": "",
+        "authorList": ["Ellpeck"],
+        "credits": "Commission for Drakallen",
+        "logoFile": "",
+        "screenshots": [
+        ],
+        "parent": "",
+        "dependencies": [
+        ]
+    }
+]

@@ -1,6 +1,6 @@
 package de.ellpeck.nyx.enchantments;
 
-import de.ellpeck.nyx.Events;
+import de.ellpeck.nyx.events.Events;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.DamageSource;

@@ -1,5 +1,7 @@
-package de.ellpeck.nyx;
+package de.ellpeck.nyx.events;
 
+import de.ellpeck.nyx.Nyx;
+import de.ellpeck.nyx.Registry;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -18,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -34,16 +37,18 @@ public final class Events {
 
     @SubscribeEvent
     public static void onExpDrop(LivingExperienceDropEvent event) {
-        EntityPlayer player = event.getAttackingPlayer();
-        if (player == null)
-            return;
-        ItemStack held = player.getHeldItemMainhand();
-        int level = EnchantmentHelper.getEnchantmentLevel(Registry.LUNAR_EDGE, held);
-        if (level <= 0)
-            return;
-        float exp = event.getDroppedExperience();
-        float mod = 2 * (level / (float) Registry.LUNAR_EDGE.getMaxLevel());
-        event.setDroppedExperience(MathHelper.floor(exp * mod));
+        if (Nyx.enchantments && Nyx.lunarEdgeXp) {
+            EntityPlayer player = event.getAttackingPlayer();
+            if (player == null)
+                return;
+            ItemStack held = player.getHeldItemMainhand();
+            int level = EnchantmentHelper.getEnchantmentLevel(Registry.LUNAR_EDGE, held);
+            if (level <= 0)
+                return;
+            float exp = event.getDroppedExperience();
+            float mod = 2 * (level / (float) Registry.LUNAR_EDGE.getMaxLevel());
+            event.setDroppedExperience(MathHelper.floor(exp * mod));
+        }
     }
 
     @SubscribeEvent
@@ -55,22 +60,24 @@ public final class Events {
             return;
 
         // Set random effect
-        Potion effect = null;
-        int i = entity.world.rand.nextInt(20);
-        if (i <= 2) {
-            effect = MobEffects.SPEED;
-        } else if (i <= 4) {
-            effect = MobEffects.STRENGTH;
-        } else if (i <= 6) {
-            effect = MobEffects.REGENERATION;
-        } else if (i <= 7) {
-            effect = MobEffects.INVISIBILITY;
+        if (Nyx.addPotionEffects) {
+            Potion effect = null;
+            int i = entity.world.rand.nextInt(20);
+            if (i <= 2) {
+                effect = MobEffects.SPEED;
+            } else if (i <= 4) {
+                effect = MobEffects.STRENGTH;
+            } else if (i <= 6) {
+                effect = MobEffects.REGENERATION;
+            } else if (i <= 7) {
+                effect = MobEffects.INVISIBILITY;
+            }
+            if (effect != null)
+                entity.addPotionEffect(new PotionEffect(effect, Integer.MAX_VALUE));
         }
-        if (effect != null)
-            entity.addPotionEffect(new PotionEffect(effect, Integer.MAX_VALUE));
 
         // Spawn a second one
-        if (entity.world.rand.nextInt(5) == 0) {
+        if (Nyx.additionalMobsChance > 0 && entity.world.rand.nextInt(Nyx.additionalMobsChance) == 0) {
             String key = Nyx.ID + ":added_spawn";
             if (!entity.getEntityData().getBoolean(key)) {
                 ResourceLocation name = EntityList.getKey(entity);
@@ -81,6 +88,12 @@ public final class Events {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (Nyx.ID.equals(event.getModID()))
+            Nyx.loadConfig();
     }
 
     private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {
