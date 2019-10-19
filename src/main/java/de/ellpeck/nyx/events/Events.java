@@ -50,11 +50,11 @@ public final class Events {
             if (player == null)
                 return;
             ItemStack held = player.getHeldItemMainhand();
-            int level = EnchantmentHelper.getEnchantmentLevel(Registry.LUNAR_EDGE, held);
+            int level = EnchantmentHelper.getEnchantmentLevel(Registry.lunarEdge, held);
             if (level <= 0)
                 return;
             float exp = event.getDroppedExperience();
-            float mod = 2 * (level / (float) Registry.LUNAR_EDGE.getMaxLevel());
+            float mod = 2 * (level / (float) Registry.lunarEdge.getMaxLevel());
             event.setDroppedExperience(MathHelper.floor(exp * mod));
         }
     }
