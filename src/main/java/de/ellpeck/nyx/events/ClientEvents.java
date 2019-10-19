@@ -52,6 +52,7 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event) {
         registerFluidRenderer(Registry.lunarWaterFluid);
+        ModelLoader.setCustomModelResourceLocation(Registry.lunarWaterBottle, 0, new ModelResourceLocation(Registry.lunarWaterBottle.getRegistryName(), "inventory"));
     }
 
     // Just stole this fluid stuff from Actually Additions lol

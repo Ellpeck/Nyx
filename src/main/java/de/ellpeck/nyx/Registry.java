@@ -4,8 +4,10 @@ import de.ellpeck.nyx.blocks.LunarWater;
 import de.ellpeck.nyx.blocks.LunarWaterFluid;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
+import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -20,6 +22,7 @@ public final class Registry {
 
     public static Fluid lunarWaterFluid;
     public static Block lunarWater;
+    public static Item lunarWaterBottle;
 
     @SubscribeEvent
     public static void onEnchantmentRegistry(RegistryEvent.Register<Enchantment> event) {
@@ -39,9 +42,13 @@ public final class Registry {
             FluidRegistry.addBucketForFluid(fluid);
             lunarWaterFluid = FluidRegistry.getFluid(fluid.getName());
 
-            event.getRegistry().registerAll(
-                    lunarWater = new LunarWater(lunarWaterFluid)
-            );
+            event.getRegistry().register(lunarWater = new LunarWater(lunarWaterFluid));
         }
+    }
+
+    @SubscribeEvent
+    public static void onItemRegistry(RegistryEvent.Register<Item> event) {
+        if (Nyx.lunarWater)
+            event.getRegistry().register(lunarWaterBottle = new LunarWaterBottle());
     }
 }

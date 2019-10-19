@@ -14,9 +14,6 @@ public class Nyx {
     public static final String NAME = "Nyx";
     public static final String VERSION = "@VERSION@";
 
-    @Instance
-    public static Nyx instance;
-
     public static Configuration config;
     public static boolean enchantments;
     public static boolean lunarWater;
