@@ -2,6 +2,9 @@ package de.ellpeck.nyx.events;
 
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEnchantmentTable;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -16,13 +19,16 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -96,6 +102,23 @@ public final class Events {
     public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (Nyx.ID.equals(event.getModID()))
             Nyx.loadConfig();
+    }
+
+    @SubscribeEvent
+    public static void onInteract(PlayerInteractEvent.RightClickBlock event) {
+        if (Nyx.disallowDayEnchanting) {
+            World world = event.getWorld();
+            long time = world.getWorldTime() % 24000;
+            if (time > 13000 && time < 23000)
+                return;
+            BlockPos pos = event.getPos();
+            IBlockState state = world.getBlockState(pos);
+            Block block = state.getBlock();
+            if (!(block instanceof BlockEnchantmentTable))
+                return;
+            event.setUseBlock(Event.Result.DENY);
+            event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("info." + Nyx.ID + ".day_enchanting"), true);
+        }
     }
 
     private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {

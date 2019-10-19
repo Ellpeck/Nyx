@@ -25,6 +25,7 @@ public class Nyx {
     public static boolean addPotionEffects;
     public static int additionalMobsChance;
     public static boolean lunarEdgeXp;
+    public static boolean disallowDayEnchanting;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -38,6 +39,7 @@ public class Nyx {
         addPotionEffects = config.get(Configuration.CATEGORY_GENERAL, "addPotionEffects", true, "If mobs spawned during a full moon should have random potion effects applied to them (similarly to spiders in the base game)").getBoolean();
         additionalMobsChance = config.get(Configuration.CATEGORY_GENERAL, "additionalMobsChance", 5, "The chance for an additional mob to be spawned when a mob spawns during a full moon. The higher the number, the less likely. Set to 0 to disable.", 0, 1000).getInt();
         lunarEdgeXp = config.get(Configuration.CATEGORY_GENERAL, "lunarEdgeXp", true, "If a weapon enchanted with lunar edge should increase the experience drops of mobs").getBoolean();
+        disallowDayEnchanting = config.get(Configuration.CATEGORY_GENERAL, "disallowDayEnchanting", true, "If enchanting should be disallowed during the day").getBoolean();
 
         if (config.hasChanged())
             config.save();
