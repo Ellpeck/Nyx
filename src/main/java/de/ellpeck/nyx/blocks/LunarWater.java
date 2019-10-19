@@ -1,7 +1,11 @@
 package de.ellpeck.nyx.blocks;
 
 import de.ellpeck.nyx.Nyx;
+import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -16,6 +20,12 @@ public class LunarWater extends BlockFluidClassic {
         this.setTranslationKey(Nyx.ID + "." + this.getRegistryName().getPath());
 
         this.displacements.put(this, false);
+    }
+
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (entityIn instanceof EntityLivingBase)
+            LunarWaterBottle.applyLunarWater((EntityLivingBase) entityIn);
     }
 
     @Override

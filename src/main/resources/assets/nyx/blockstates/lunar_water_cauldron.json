@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "level=0": {
+            "model": "nyx:lunar_water_cauldron"
+        },
+        "level=1": {
+            "model": "nyx:lunar_water_cauldron_level1"
+        },
+        "level=2": {
+            "model": "nyx:lunar_water_cauldron_level2"
+        },
+        "level=3": {
+            "model": "nyx:lunar_water_cauldron_level3"
+        }
+    }
+}

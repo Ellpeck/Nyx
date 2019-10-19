@@ -1,11 +1,13 @@
 package de.ellpeck.nyx;
 
+import de.ellpeck.nyx.entities.CauldronTracker;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 @Mod(modid = Nyx.ID, name = Nyx.NAME, version = Nyx.VERSION, guiFactory = "de.ellpeck.nyx.GuiFactory")
 public class Nyx {
@@ -13,6 +15,9 @@ public class Nyx {
     public static final String ID = "nyx";
     public static final String NAME = "Nyx";
     public static final String VERSION = "@VERSION@";
+
+    @Mod.Instance
+    public static Nyx instance;
 
     public static Configuration config;
     public static boolean enchantments;
@@ -31,6 +36,9 @@ public class Nyx {
         config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
         loadConfig();
+
+        if (lunarWater)
+            EntityRegistry.registerModEntity(new ResourceLocation(ID, "worm"), CauldronTracker.class, ID + ".cauldron_tracker", 0, instance, 1, 1000, false);
     }
 
     public static void loadConfig() {

@@ -3,6 +3,8 @@ package de.ellpeck.nyx.events;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.enchantments.NyxEnchantment;
+import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.entities.CauldronTrackerRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -21,6 +23,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -51,8 +54,11 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event) {
-        registerFluidRenderer(Registry.lunarWaterFluid);
-        ModelLoader.setCustomModelResourceLocation(Registry.lunarWaterBottle, 0, new ModelResourceLocation(Registry.lunarWaterBottle.getRegistryName(), "inventory"));
+        if (Nyx.lunarWater) {
+            registerFluidRenderer(Registry.lunarWaterFluid);
+            ModelLoader.setCustomModelResourceLocation(Registry.lunarWaterBottle, 0, new ModelResourceLocation(Registry.lunarWaterBottle.getRegistryName(), "inventory"));
+            RenderingRegistry.registerEntityRenderingHandler(CauldronTracker.class, CauldronTrackerRenderer::new);
+        }
     }
 
     // Just stole this fluid stuff from Actually Additions lol

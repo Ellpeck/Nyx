@@ -8,6 +8,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -24,12 +25,26 @@ public class LunarWaterBottle extends Item {
         this.setMaxStackSize(1);
     }
 
+    public static boolean applyLunarWater(EntityLivingBase entity) {
+        boolean did = false;
+        for (PotionEffect effect : entity.getActivePotionEffects()) {
+            Potion potion = effect.getPotion();
+            if (potion.isBadEffect()) {
+                entity.removePotionEffect(potion);
+                did = true;
+            }
+        }
+        if (entity.getActivePotionEffect(MobEffects.REGENERATION) == null) {
+            entity.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 5 * 20, 1));
+            did = true;
+        }
+        return did;
+    }
+
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-        if (!worldIn.isRemote) {
-            entityLiving.curePotionEffects(stack);
-            entityLiving.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 5 * 20, 1));
-        }
+        if (!worldIn.isRemote)
+            applyLunarWater(entityLiving);
         return new ItemStack(Items.GLASS_BOTTLE);
     }
 

@@ -2,7 +2,9 @@ package de.ellpeck.nyx.events;
 
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.entities.CauldronTracker;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -12,11 +14,15 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -26,6 +32,9 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -106,19 +115,67 @@ public final class Events {
 
     @SubscribeEvent
     public static void onInteract(PlayerInteractEvent.RightClickBlock event) {
+        EntityPlayer player = event.getEntityPlayer();
+        World world = event.getWorld();
+        BlockPos pos = event.getPos();
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        ench:
         if (Nyx.disallowDayEnchanting) {
-            World world = event.getWorld();
             long time = world.getWorldTime() % 24000;
             if (time > 13000 && time < 23000)
-                return;
-            BlockPos pos = event.getPos();
-            IBlockState state = world.getBlockState(pos);
-            Block block = state.getBlock();
+                break ench;
             if (!(block instanceof BlockEnchantmentTable))
-                return;
+                break ench;
             event.setUseBlock(Event.Result.DENY);
-            event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("info." + Nyx.ID + ".day_enchanting"), true);
+            player.sendStatusMessage(new TextComponentTranslation("info." + Nyx.ID + ".day_enchanting"), true);
         }
+
+        lunar:
+        if (Nyx.lunarWater) {
+            if (!(block instanceof BlockCauldron))
+                break lunar;
+            int level = state.getValue(BlockCauldron.LEVEL);
+            if (level > 0)
+                break lunar;
+
+            ItemStack holding = player.getHeldItem(EnumHand.MAIN_HAND);
+            if (holding.isEmpty())
+                break lunar;
+            FluidStack fluid = FluidUtil.getFluidContained(holding);
+            if (fluid == null || fluid.getFluid() != Registry.lunarWaterFluid || fluid.amount < 1000)
+                break lunar;
+            level = 3;
+
+            if (!world.isRemote) {
+                player.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.BUCKET));
+                world.setBlockState(pos, Registry.lunarWaterCauldron.getDefaultState().withProperty(BlockCauldron.LEVEL, level));
+            }
+
+            player.swingArm(EnumHand.MAIN_HAND);
+            event.setCanceled(true);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockChanged(BlockEvent.NeighborNotifyEvent event) {
+        World world = event.getWorld();
+        if (world.isRemote)
+            return;
+
+        BlockPos pos = event.getPos();
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (!(block instanceof BlockCauldron))
+            return;
+        if (!world.getEntitiesWithinAABB(CauldronTracker.class, new AxisAlignedBB(pos)).isEmpty())
+            return;
+
+        CauldronTracker tracker = new CauldronTracker(world);
+        tracker.setTrackingPos(pos);
+        world.spawnEntity(tracker);
     }
 
     private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {

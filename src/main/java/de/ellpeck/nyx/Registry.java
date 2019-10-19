@@ -1,6 +1,7 @@
 package de.ellpeck.nyx;
 
 import de.ellpeck.nyx.blocks.LunarWater;
+import de.ellpeck.nyx.blocks.LunarWaterCauldron;
 import de.ellpeck.nyx.blocks.LunarWaterFluid;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
@@ -20,8 +21,11 @@ public final class Registry {
     public static Enchantment lunarEdge;
     public static Enchantment lunarShield;
 
-    public static Fluid lunarWaterFluid;
     public static Block lunarWater;
+    public static Block lunarWaterCauldron;
+
+    public static Fluid lunarWaterFluid;
+
     public static Item lunarWaterBottle;
 
     @SubscribeEvent
@@ -42,7 +46,10 @@ public final class Registry {
             FluidRegistry.addBucketForFluid(fluid);
             lunarWaterFluid = FluidRegistry.getFluid(fluid.getName());
 
-            event.getRegistry().register(lunarWater = new LunarWater(lunarWaterFluid));
+            event.getRegistry().registerAll(
+                    lunarWater = new LunarWater(lunarWaterFluid),
+                    lunarWaterCauldron = new LunarWaterCauldron()
+            );
         }
     }
 
