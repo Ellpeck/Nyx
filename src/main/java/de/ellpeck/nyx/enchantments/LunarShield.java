@@ -1,6 +1,6 @@
 package de.ellpeck.nyx.enchantments;
 
-import de.ellpeck.nyx.events.Events;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -20,7 +20,7 @@ public class LunarShield extends NyxEnchantment {
         if (source.canHarmInCreative()) {
             return 0;
         } else {
-            return MathHelper.floor((level + 1) * Events.moonPhase);
+            return MathHelper.floor((level + 1) * NyxWorld.moonPhase);
         }
     }
 

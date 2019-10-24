@@ -2,7 +2,10 @@ package de.ellpeck.nyx.events;
 
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.network.PacketHandler;
+import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.BlockEnchantmentTable;
@@ -14,6 +17,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
@@ -26,9 +30,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -44,12 +49,22 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 @EventBusSubscriber(modid = Nyx.ID)
 public final class Events {
 
-    public static float moonPhase;
-
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.world.provider.getDimensionType() == DimensionType.OVERWORLD)
-            moonPhase = event.world.getCurrentMoonPhaseFactor();
+        if (event.world.hasCapability(Registry.worldCapability, null))
+            event.world.getCapability(Registry.worldCapability, null).update();
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(EntityJoinWorldEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityPlayerMP) {
+            World world = entity.getEntityWorld();
+            if (!world.isRemote && world.hasCapability(Registry.worldCapability, null)) {
+                PacketNyxWorld packet = new PacketNyxWorld(world.getCapability(Registry.worldCapability, null));
+                PacketHandler.sendTo((EntityPlayerMP) entity, packet);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -65,6 +80,21 @@ public final class Events {
             float exp = event.getDroppedExperience();
             float mod = 2 * (level / (float) Registry.lunarEdge.getMaxLevel());
             event.setDroppedExperience(MathHelper.floor(exp * mod));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (!(entity instanceof IMob))
+            return;
+
+        // Don't spawn mobs during harvest moon
+        if (Nyx.harvestMoon && entity.world.hasCapability(Registry.worldCapability, null)) {
+            NyxWorld world = entity.world.getCapability(Registry.worldCapability, null);
+            if (world.isHarvestMoon && event.getSpawner() == null) {
+                event.setResult(Event.Result.DENY);
+            }
         }
     }
 
@@ -176,6 +206,11 @@ public final class Events {
         CauldronTracker tracker = new CauldronTracker(world);
         tracker.setTrackingPos(pos);
         world.spawnEntity(tracker);
+    }
+
+    @SubscribeEvent
+    public static void onWorldCapabilities(AttachCapabilitiesEvent<World> event) {
+        event.addCapability(new ResourceLocation(Nyx.ID, "world_cap"), new NyxWorld(event.getObject()));
     }
 
     private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {

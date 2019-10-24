@@ -1,6 +1,6 @@
 package de.ellpeck.nyx.enchantments;
 
-import de.ellpeck.nyx.events.Events;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentDamage;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -19,7 +19,7 @@ public class LunarEdge extends NyxEnchantment {
     @Override
     public float calcDamageByCreature(int level, EnumCreatureAttribute creatureType) {
         float baseDamage = 1.25F + (float) Math.max(0, level - 1) * 0.5F;
-        return Events.moonPhase * baseDamage;
+        return NyxWorld.moonPhase * baseDamage;
     }
 
     @Override
