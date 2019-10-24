@@ -17,6 +17,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class LunarWaterBottle extends Item {
 
     public LunarWaterBottle() {
@@ -29,13 +32,17 @@ public class LunarWaterBottle extends Item {
 
     public static boolean applyLunarWater(EntityLivingBase entity) {
         boolean did = false;
+
+        Set<Potion> effectsToRemove = new HashSet<>();
         for (PotionEffect effect : entity.getActivePotionEffects()) {
             Potion potion = effect.getPotion();
             if (potion.isBadEffect()) {
-                entity.removePotionEffect(potion);
+                effectsToRemove.add(potion);
                 did = true;
             }
         }
+        effectsToRemove.forEach(entity::removePotionEffect);
+
         if (entity.getActivePotionEffect(MobEffects.REGENERATION) == null) {
             entity.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 5 * 20, 1));
             did = true;
