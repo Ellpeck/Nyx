@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -120,7 +121,7 @@ public final class Events {
             return;
 
         // Set random effect
-        if (Nyx.addPotionEffects) {
+        if (Nyx.addPotionEffects && !(entity instanceof EntityCreeper)) {
             Potion effect = null;
             int i = entity.world.rand.nextInt(20);
             if (i <= 2) {
