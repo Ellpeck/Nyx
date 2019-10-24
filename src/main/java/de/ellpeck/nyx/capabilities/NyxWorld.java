@@ -4,9 +4,13 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,8 +26,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
     public final World world;
     public boolean isHarvestMoon;
+    public float harvestMoonSkyModifier;
     private boolean wasDaytime;
-    private boolean isDirty;
 
     public NyxWorld(World world) {
         this.world = world;
@@ -35,25 +39,38 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
         moonPhase = this.world.getCurrentMoonPhaseFactor();
 
-        if (this.world.isRemote)
-            return;
+        if (!this.world.isRemote) {
+            boolean isDirty = false;
 
-        if (Nyx.harvestMoon) {
-            if (this.shouldHarvestMoonStart()) {
-                this.isHarvestMoon = true;
-                this.isDirty = true;
-            }
-            this.wasDaytime = this.world.isDaytime();
-            if (this.wasDaytime && this.isHarvestMoon) {
-                this.isHarvestMoon = false;
-                this.isDirty = true;
-            }
-        }
+            if (Nyx.harvestMoon) {
+                if (this.shouldHarvestMoonStart()) {
+                    this.isHarvestMoon = true;
+                    isDirty = true;
 
-        if (this.isDirty) {
-            this.isDirty = false;
-            for (EntityPlayerMP player : this.world.getPlayers(EntityPlayerMP.class, p -> true))
-                PacketHandler.sendTo(player, new PacketNyxWorld(this));
+                    ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".harvest_moon")
+                            .setStyle(new Style().setColor(TextFormatting.BLUE).setItalic(true));
+                    for (EntityPlayer player : this.world.playerEntities)
+                        player.sendMessage(text);
+                }
+                this.wasDaytime = this.world.isDaytime();
+                if (this.wasDaytime && this.isHarvestMoon) {
+                    this.isHarvestMoon = false;
+                    isDirty = true;
+                }
+            }
+
+            if (isDirty) {
+                for (EntityPlayer player : this.world.playerEntities)
+                    PacketHandler.sendTo(player, new PacketNyxWorld(this));
+            }
+        } else {
+            if (this.isHarvestMoon) {
+                if (this.harvestMoonSkyModifier < 1)
+                    this.harvestMoonSkyModifier += 0.01F;
+            } else {
+                if (this.harvestMoonSkyModifier > 0)
+                    this.harvestMoonSkyModifier -= 0.01F;
+            }
         }
     }
 

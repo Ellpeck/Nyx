@@ -2,6 +2,7 @@ package de.ellpeck.nyx.events;
 
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.NyxEnchantment;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.CauldronTrackerRenderer;
@@ -19,6 +20,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -26,6 +29,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.List;
@@ -53,6 +57,29 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START)
+            return;
+        World world = Minecraft.getMinecraft().world;
+        if (world != null && world.hasCapability(Registry.worldCapability, null))
+            world.getCapability(Registry.worldCapability, null).update();
+    }
+
+    @SubscribeEvent
+    public static void onFogRender(EntityViewRenderEvent.FogColors event) {
+        World world = Minecraft.getMinecraft().world;
+        if (!world.hasCapability(Registry.worldCapability, null))
+            return;
+        NyxWorld nyxWorld = world.getCapability(Registry.worldCapability, null);
+        if (!nyxWorld.isHarvestMoon)
+            return;
+        float mod = nyxWorld.harvestMoonSkyModifier;
+        event.setRed(lerp(event.getRed(), 0.25F, mod));
+        event.setGreen(lerp(event.getGreen(), 0.25F, mod));
+        event.setBlue(lerp(event.getBlue(), 0.75F, mod));
+    }
+
+    @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event) {
         if (Nyx.lunarWater) {
             registerFluidRenderer(Registry.lunarWaterFluid);
@@ -69,6 +96,10 @@ public final class ClientEvents {
         ModelBakery.registerItemVariants(item);
         ModelLoader.setCustomMeshDefinition(item, mapper);
         ModelLoader.setCustomStateMapper(block, mapper);
+    }
+
+    private static float lerp(float a, float b, float f) {
+        return a + f * (b - a);
     }
 
     private static class FluidStateMapper extends StateMapperBase implements ItemMeshDefinition {

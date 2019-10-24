@@ -4,6 +4,7 @@ enchantment.nyx.lunar_shield=Lunar Shield
 enchantment.nyx.lunar_shield.desc=Stronger version of Protection whose strength is affected by the current moon phase
 
 info.nyx.day_enchanting=It's too light out to enchant right now
+info.nyx.harvest_moon=The Harvest Moon is rising...
 
 tile.nxy.lunar_water.name=Lunar Water
 tile.nyx.lunar_water_cauldron.name=Cauldron of Lunar Water

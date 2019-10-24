@@ -51,6 +51,8 @@ public final class Events {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
+        if (event.phase != TickEvent.Phase.START)
+            return;
         if (event.world.hasCapability(Registry.worldCapability, null))
             event.world.getCapability(Registry.worldCapability, null).update();
     }
