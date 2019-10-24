@@ -1,6 +1,7 @@
 package de.ellpeck.nyx.items;
 
 import de.ellpeck.nyx.Nyx;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -21,6 +22,7 @@ public class LunarWaterBottle extends Item {
     public LunarWaterBottle() {
         this.setRegistryName(new ResourceLocation(Nyx.ID, "lunar_water_bottle"));
         this.setTranslationKey(Nyx.ID + "." + this.getRegistryName().getPath());
+        this.setCreativeTab(CreativeTabs.MISC);
 
         this.setMaxStackSize(1);
     }
