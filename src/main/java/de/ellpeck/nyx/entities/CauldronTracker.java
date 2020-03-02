@@ -73,7 +73,7 @@ public class CauldronTracker extends Entity {
             }
 
             this.timer++;
-            if (this.timer >= 10/*000*/)
+            if (this.timer >= 10000)
                 this.dataManager.set(IS_DONE, true);
         } else {
             List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.trackingPos));
