@@ -73,7 +73,7 @@ public class CauldronTracker extends Entity {
             }
 
             this.timer++;
-            if (this.timer >= 10000)
+            if (this.timer >= 10/*000*/)
                 this.dataManager.set(IS_DONE, true);
         } else {
             List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.trackingPos));
@@ -83,6 +83,7 @@ public class CauldronTracker extends Entity {
                 ItemStack stack = item.getItem();
                 if (stack.getItem() != Items.DYE || stack.getMetadata() != EnumDyeColor.BLUE.getDyeDamage())
                     continue;
+                item.setDead();
 
                 IBlockState newState = Registry.lunarWaterCauldron.getDefaultState().withProperty(BlockCauldron.LEVEL, level);
                 this.world.setBlockState(this.trackingPos, newState);
@@ -95,12 +96,14 @@ public class CauldronTracker extends Entity {
     protected void readEntityFromNBT(NBTTagCompound compound) {
         this.setTrackingPos(NBTUtil.getPosFromTag(compound.getCompoundTag("tracking_pos")));
         this.timer = compound.getInteger("timer");
+        this.dataManager.set(IS_DONE, compound.getBoolean("done"));
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound) {
         compound.setTag("tracking_pos", NBTUtil.createPosTag(this.trackingPos));
         compound.setInteger("timer", this.timer);
+        compound.setBoolean("done", this.dataManager.get(IS_DONE));
     }
 
     @Override
