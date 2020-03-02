@@ -18,6 +18,7 @@ public class LunarWater extends BlockFluidClassic {
         super(fluid, Material.WATER);
         this.setRegistryName(new ResourceLocation(Nyx.ID, "lunar_water"));
         this.setTranslationKey(Nyx.ID + "." + this.getRegistryName().getPath());
+        this.setLightLevel(1);
 
         this.displacements.put(this, false);
     }

@@ -27,6 +27,7 @@ public class LunarWaterCauldron extends BlockCauldron {
     public LunarWaterCauldron() {
         this.setRegistryName(new ResourceLocation(Nyx.ID, "lunar_water_cauldron"));
         this.setTranslationKey(Nyx.ID + "." + this.getRegistryName().getPath());
+        this.setLightLevel(0.8F);
     }
 
     @Override
