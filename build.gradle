@@ -15,6 +15,9 @@ version = "1.1.0"
 group = "de.ellpeck.nyx"
 archivesBaseName = "Nyx"
 
+if (System.getenv('BUILD_NUMBER') != null) {
+    version += "." + System.getenv('BUILD_NUMBER')
+}
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
