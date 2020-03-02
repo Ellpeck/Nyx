@@ -49,7 +49,7 @@ public class Nyx {
         loadConfig();
 
         if (lunarWater)
-            EntityRegistry.registerModEntity(new ResourceLocation(ID, "worm"), CauldronTracker.class, ID + ".cauldron_tracker", 0, instance, 1, 1000, false);
+            EntityRegistry.registerModEntity(new ResourceLocation(ID, "cauldron_tracker"), CauldronTracker.class, ID + ".cauldron_tracker", 0, instance, 64, 20, false);
 
         CapabilityManager.INSTANCE.register(NyxWorld.class, new Capability.IStorage<NyxWorld>() {
             @Nullable
