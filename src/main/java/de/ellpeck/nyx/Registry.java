@@ -10,6 +10,8 @@ import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,6 +35,8 @@ public final class Registry {
     public static Fluid lunarWaterFluid;
 
     public static Item lunarWaterBottle;
+
+    public static SoundEvent lunarWaterSound;
 
     @SubscribeEvent
     public static void onEnchantmentRegistry(RegistryEvent.Register<Enchantment> event) {
@@ -63,5 +67,12 @@ public final class Registry {
     public static void onItemRegistry(RegistryEvent.Register<Item> event) {
         if (Nyx.lunarWater)
             event.getRegistry().register(lunarWaterBottle = new LunarWaterBottle());
+    }
+
+    @SubscribeEvent
+    public static void onSoundRegistry(RegistryEvent.Register<SoundEvent> event) {
+        event.getRegistry().registerAll(
+                lunarWaterSound = new SoundEvent(new ResourceLocation(Nyx.ID, "lunar_water")).setRegistryName("lunar_water")
+        );
     }
 }

@@ -1,0 +1,6 @@
+{
+    "lunar_water": {
+        "category": "block",
+        "sounds": ["nyx:lunar_water"]
+    }
+}

@@ -15,9 +15,11 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 import java.util.List;
 
@@ -87,6 +89,7 @@ public class CauldronTracker extends Entity {
 
                 IBlockState newState = Registry.lunarWaterCauldron.getDefaultState().withProperty(BlockCauldron.LEVEL, level);
                 this.world.setBlockState(this.trackingPos, newState);
+                this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.lunarWaterSound, SoundCategory.BLOCKS, 1, 1);
                 this.setDead();
             }
         }
