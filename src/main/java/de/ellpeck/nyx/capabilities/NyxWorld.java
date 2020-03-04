@@ -1,5 +1,6 @@
 package de.ellpeck.nyx.capabilities;
 
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.network.PacketHandler;
@@ -42,7 +43,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         if (!this.world.isRemote) {
             boolean isDirty = false;
 
-            if (Nyx.harvestMoon) {
+            if (Config.harvestMoon) {
                 if (this.shouldHarvestMoonStart()) {
                     this.isHarvestMoon = true;
                     isDirty = true;
@@ -80,7 +81,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         // check if it just turned night time
         if (!this.wasDaytime || this.world.isDaytime())
             return false;
-        return this.world.rand.nextDouble() <= Nyx.harvestMoonChance;
+        return this.world.rand.nextDouble() <= Config.harvestMoonChance;
     }
 
     @Override

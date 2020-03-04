@@ -1,5 +1,6 @@
 package de.ellpeck.nyx.events;
 
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
@@ -81,7 +82,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event) {
-        if (Nyx.lunarWater) {
+        if (Config.lunarWater) {
             registerFluidRenderer(Registry.lunarWaterFluid);
             ModelLoader.setCustomModelResourceLocation(Registry.lunarWaterBottle, 0, new ModelResourceLocation(Registry.lunarWaterBottle.getRegistryName(), "inventory"));
             RenderingRegistry.registerEntityRenderingHandler(CauldronTracker.class, CauldronTrackerRenderer::new);

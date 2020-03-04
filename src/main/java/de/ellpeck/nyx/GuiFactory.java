@@ -37,11 +37,11 @@ public class GuiFactory implements IModGuiFactory {
     public static class ConfigGui extends GuiConfig {
 
         public ConfigGui(GuiScreen parentScreen) {
-            super(parentScreen, getConfigElements(), Nyx.ID, false, false, getAbridgedConfigPath(Nyx.config.toString()));
+            super(parentScreen, getConfigElements(), Nyx.ID, false, false, getAbridgedConfigPath(Config.instance.toString()));
         }
 
         private static List<IConfigElement> getConfigElements() {
-            return Collections.singletonList(new ConfigElement(Nyx.config.getCategory(Configuration.CATEGORY_GENERAL)));
+            return Collections.singletonList(new ConfigElement(Config.instance.getCategory(Configuration.CATEGORY_GENERAL)));
         }
     }
 }

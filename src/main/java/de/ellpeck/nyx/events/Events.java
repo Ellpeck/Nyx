@@ -1,5 +1,6 @@
 package de.ellpeck.nyx.events;
 
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
@@ -77,13 +78,13 @@ public final class Events {
             return;
         if (!world.getCapability(Registry.worldCapability, null).isHarvestMoon)
             return;
-        if (world.rand.nextDouble() <= Nyx.harvestMoonGrowthChance)
+        if (world.rand.nextDouble() <= Config.harvestMoonGrowthChance)
             event.setResult(Event.Result.ALLOW);
     }
 
     @SubscribeEvent
     public static void onExpDrop(LivingExperienceDropEvent event) {
-        if (Nyx.enchantments && Nyx.lunarEdgeXp) {
+        if (Config.enchantments && Config.lunarEdgeXp) {
             EntityPlayer player = event.getAttackingPlayer();
             if (player == null)
                 return;
@@ -104,7 +105,7 @@ public final class Events {
             return;
 
         // Don't spawn mobs during harvest moon
-        if (Nyx.harvestMoon && entity.world.hasCapability(Registry.worldCapability, null)) {
+        if (Config.harvestMoon && entity.world.hasCapability(Registry.worldCapability, null)) {
             NyxWorld world = entity.world.getCapability(Registry.worldCapability, null);
             if (world.isHarvestMoon && event.getSpawner() == null) {
                 event.setResult(Event.Result.DENY);
@@ -121,7 +122,7 @@ public final class Events {
             return;
 
         // Set random effect
-        if (Nyx.addPotionEffects && !(entity instanceof EntityCreeper)) {
+        if (Config.addPotionEffects && !(entity instanceof EntityCreeper)) {
             Potion effect = null;
             int i = entity.world.rand.nextInt(20);
             if (i <= 2) {
@@ -138,7 +139,7 @@ public final class Events {
         }
 
         // Spawn a second one
-        if (Nyx.additionalMobsChance > 0 && entity.world.rand.nextInt(Nyx.additionalMobsChance) == 0) {
+        if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0) {
             String key = Nyx.ID + ":added_spawn";
             if (!entity.getEntityData().getBoolean(key)) {
                 ResourceLocation name = EntityList.getKey(entity);
@@ -154,7 +155,7 @@ public final class Events {
     @SubscribeEvent
     public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (Nyx.ID.equals(event.getModID()))
-            Nyx.loadConfig();
+            Config.load();
     }
 
     @SubscribeEvent
@@ -166,7 +167,7 @@ public final class Events {
         Block block = state.getBlock();
 
         ench:
-        if (Nyx.disallowDayEnchanting) {
+        if (Config.disallowDayEnchanting) {
             long time = world.getWorldTime() % 24000;
             if (time > 13000 && time < 23000)
                 break ench;
@@ -177,7 +178,7 @@ public final class Events {
         }
 
         lunar:
-        if (Nyx.lunarWater) {
+        if (Config.lunarWater) {
             if (!(block instanceof BlockCauldron))
                 break lunar;
             int level = state.getValue(BlockCauldron.LEVEL);
