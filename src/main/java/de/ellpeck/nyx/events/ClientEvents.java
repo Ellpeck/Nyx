@@ -84,9 +84,11 @@ public final class ClientEvents {
     public static void onModelRegistry(ModelRegistryEvent event) {
         if (Config.lunarWater) {
             registerFluidRenderer(Registry.lunarWaterFluid);
-            ModelLoader.setCustomModelResourceLocation(Registry.lunarWaterBottle, 0, new ModelResourceLocation(Registry.lunarWaterBottle.getRegistryName(), "inventory"));
             RenderingRegistry.registerEntityRenderingHandler(CauldronTracker.class, CauldronTrackerRenderer::new);
         }
+
+        for (Item item : Registry.MOD_ITEMS)
+            ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
     // Just stole this fluid stuff from Actually Additions lol

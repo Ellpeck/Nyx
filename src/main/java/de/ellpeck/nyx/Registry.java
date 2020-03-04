@@ -27,9 +27,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = Nyx.ID)
 public final class Registry {
+
+    public static final Set<Item> MOD_ITEMS = new HashSet<>();
 
     @CapabilityInject(NyxWorld.class)
     public static Capability<NyxWorld> worldCapability;
@@ -43,6 +49,7 @@ public final class Registry {
     public static Fluid lunarWaterFluid;
 
     public static Item lunarWaterBottle;
+    public static Item cometShard;
 
     public static SoundEvent lunarWaterSound;
 
@@ -75,6 +82,7 @@ public final class Registry {
     public static void onItemRegistry(RegistryEvent.Register<Item> event) {
         if (Config.lunarWater)
             event.getRegistry().register(lunarWaterBottle = new LunarWaterBottle());
+        event.getRegistry().register(cometShard = initItem(new Item(), "comet_shard"));
     }
 
     @SubscribeEvent
@@ -103,9 +111,11 @@ public final class Registry {
 
     }
 
-    public static void initItem(Item item, String name) {
+    public static Item initItem(Item item, String name) {
         item.setRegistryName(new ResourceLocation(Nyx.ID, name));
         item.setTranslationKey(Nyx.ID + "." + item.getRegistryName().getPath());
         item.setCreativeTab(CreativeTabs.MISC);
+        MOD_ITEMS.add(item);
+        return item;
     }
 }

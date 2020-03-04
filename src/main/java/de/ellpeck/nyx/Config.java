@@ -16,6 +16,7 @@ public final class Config {
     public static boolean disallowDayEnchanting;
     public static double harvestMoonChance;
     public static double harvestMoonGrowthChance;
+    public static double cometShardGuardianChance;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -33,6 +34,7 @@ public final class Config {
         disallowDayEnchanting = instance.get(Configuration.CATEGORY_GENERAL, "disallowDayEnchanting", true, "If enchanting should be disallowed during the day").getBoolean();
         harvestMoonChance = instance.get(Configuration.CATEGORY_GENERAL, "harvestMoonChance", 0.05, "The chance in percent (1 = 100%) of the harvest moon occuring on a full moon night", 0, 1).getDouble();
         harvestMoonGrowthChance = instance.get(Configuration.CATEGORY_GENERAL, "harvestMoonGrowthChance", 0.8, "The chance in percent (1 = 100%) for any crop to get an extra growth tick each random tick during the harvest moon", 0, 1).getDouble();
+        cometShardGuardianChance = instance.get(Configuration.CATEGORY_GENERAL, "cometShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a comet shard to be dropped from an elder guardian").getDouble();
 
         if (instance.hasChanged())
             instance.save();

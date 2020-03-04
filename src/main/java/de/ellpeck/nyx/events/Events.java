@@ -16,7 +16,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityElderGuardian;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -36,6 +38,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -47,6 +50,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.List;
 
 @EventBusSubscriber(modid = Nyx.ID)
 public final class Events {
@@ -95,6 +100,16 @@ public final class Events {
             float exp = event.getDroppedExperience();
             float mod = 2 * (level / (float) Registry.lunarEdge.getMaxLevel());
             event.setDroppedExperience(MathHelper.floor(exp * mod));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityDrop(LivingDropsEvent event) {
+        EntityLivingBase entity = event.getEntityLiving();
+        List<EntityItem> drops = event.getDrops();
+        if (entity instanceof EntityElderGuardian && !entity.world.isRemote && entity.world.rand.nextDouble() <= Config.cometShardGuardianChance) {
+            ItemStack stack = new ItemStack(Registry.cometShard, (event.getLootingLevel() / 2) + 1);
+            drops.add(new EntityItem(entity.world, entity.posX, entity.posY, entity.posZ, stack));
         }
     }
 
