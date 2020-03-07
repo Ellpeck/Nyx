@@ -1,5 +1,6 @@
 package de.ellpeck.nyx.entities;
 
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCauldron;
@@ -75,7 +76,7 @@ public class CauldronTracker extends Entity {
             }
 
             this.timer++;
-            if (this.timer >= 10000)
+            if (this.timer >= Config.nightTicks)
                 this.dataManager.set(IS_DONE, true);
         } else {
             List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.trackingPos));

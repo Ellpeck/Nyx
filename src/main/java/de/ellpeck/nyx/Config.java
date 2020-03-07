@@ -19,6 +19,7 @@ public final class Config {
     public static double cometShardGuardianChance;
     public static boolean fallingStars;
     public static double fallingStarRarity;
+    public static int nightTicks;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -39,6 +40,7 @@ public final class Config {
         cometShardGuardianChance = instance.get(Configuration.CATEGORY_GENERAL, "cometShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a comet shard to be dropped from an elder guardian", 0, 1).getDouble();
         fallingStars = instance.get(Configuration.CATEGORY_GENERAL, "fallingStars", true, "If falling stars should be enabled").getBoolean();
         fallingStarRarity = instance.get(Configuration.CATEGORY_GENERAL, "fallingStarRarity", 0.01F, "The chance in percent (1 = 100%) for a falling star to appear at night for each player each second", 0, 1).getDouble();
+        nightTicks = instance.get(Configuration.CATEGORY_GENERAL, "nightTicks", 10000, "The amount of ticks that an in-game night lasts for").getInt();
 
         if (instance.hasChanged())
             instance.save();
