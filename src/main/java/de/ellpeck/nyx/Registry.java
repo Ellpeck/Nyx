@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -38,6 +39,13 @@ import java.util.Set;
 public final class Registry {
 
     public static final Set<Item> MOD_ITEMS = new HashSet<>();
+
+    public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(Nyx.ID) {
+        @Override
+        public ItemStack createIcon() {
+            return new ItemStack(Registry.fallenStar);
+        }
+    };
 
     @CapabilityInject(NyxWorld.class)
     public static Capability<NyxWorld> worldCapability;
@@ -122,7 +130,7 @@ public final class Registry {
     public static Item initItem(Item item, String name) {
         item.setRegistryName(new ResourceLocation(Nyx.ID, name));
         item.setTranslationKey(Nyx.ID + "." + item.getRegistryName().getPath());
-        item.setCreativeTab(CreativeTabs.MISC);
+        item.setCreativeTab(CREATIVE_TAB);
         MOD_ITEMS.add(item);
         return item;
     }
