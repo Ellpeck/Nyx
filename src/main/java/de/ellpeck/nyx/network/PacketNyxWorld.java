@@ -49,8 +49,11 @@ public class PacketNyxWorld implements IMessage {
         public IMessage onMessage(PacketNyxWorld message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 World world = Minecraft.getMinecraft().world;
-                if (world != null && world.hasCapability(Registry.worldCapability, null))
-                    world.getCapability(Registry.worldCapability, null).deserializeNBT(message.info);
+                if (world != null) {
+                    NyxWorld nyx = NyxWorld.get(world);
+                    if (nyx != null)
+                        nyx.deserializeNBT(message.info);
+                }
             });
 
             return null;

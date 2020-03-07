@@ -25,6 +25,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -59,26 +60,40 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void onDebug(RenderGameOverlayEvent.Text event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (!mc.gameSettings.showDebugInfo)
+            return;
+        event.getLeft().add("");
+        NyxWorld world = NyxWorld.get(mc.world);
+        String pre = TextFormatting.GREEN + "[" + Nyx.NAME + "]" + TextFormatting.RESET;
+        String name = world.currentEvent == null ? "None" : world.lunarEvents.inverse().get(world.currentEvent);
+        event.getLeft().add(pre + " CurrEvent: " + name);
+    }
+
+    @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START)
             return;
         World world = Minecraft.getMinecraft().world;
-        if (world != null && world.hasCapability(Registry.worldCapability, null))
-            world.getCapability(Registry.worldCapability, null).update();
+        if (world != null) {
+            NyxWorld nyx = NyxWorld.get(world);
+            if (nyx != null)
+                nyx.update();
+        }
     }
 
     @SubscribeEvent
     public static void onFogRender(EntityViewRenderEvent.FogColors event) {
-        World world = Minecraft.getMinecraft().world;
-        if (!world.hasCapability(Registry.worldCapability, null))
+        NyxWorld world = NyxWorld.get(Minecraft.getMinecraft().world);
+        if (world == null || world.currentEvent == null)
             return;
-        NyxWorld nyxWorld = world.getCapability(Registry.worldCapability, null);
-        if (!nyxWorld.isHarvestMoon)
+        int color = world.currentEvent.getSkyColor();
+        if (color == 0)
             return;
-        float mod = nyxWorld.harvestMoonSkyModifier;
-        event.setRed(lerp(event.getRed(), 0.25F, mod));
-        event.setGreen(lerp(event.getGreen(), 0.25F, mod));
-        event.setBlue(lerp(event.getBlue(), 0.75F, mod));
+        event.setRed(lerp(event.getRed(), (color >> 16 & 255) / 255F, world.eventSkyModifier));
+        event.setGreen(lerp(event.getGreen(), (color >> 8 & 255) / 255F, world.eventSkyModifier));
+        event.setBlue(lerp(event.getBlue(), (color & 255) / 255F, world.eventSkyModifier));
     }
 
     @SubscribeEvent

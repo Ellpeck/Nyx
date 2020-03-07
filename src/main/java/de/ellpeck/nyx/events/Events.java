@@ -6,6 +6,7 @@ import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
+import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.block.Block;
@@ -61,9 +62,9 @@ public final class Events {
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if (event.phase != TickEvent.Phase.START)
             return;
-        if (!event.world.hasCapability(Registry.worldCapability, null))
+        NyxWorld data = NyxWorld.get(event.world);
+        if (data == null)
             return;
-        NyxWorld data = event.world.getCapability(Registry.worldCapability, null);
         data.update();
 
         // Falling stars
@@ -86,9 +87,12 @@ public final class Events {
         Entity entity = event.getEntity();
         if (entity instanceof EntityPlayerMP) {
             World world = entity.getEntityWorld();
-            if (!world.isRemote && world.hasCapability(Registry.worldCapability, null)) {
-                PacketNyxWorld packet = new PacketNyxWorld(world.getCapability(Registry.worldCapability, null));
-                PacketHandler.sendTo((EntityPlayerMP) entity, packet);
+            if (!world.isRemote) {
+                NyxWorld nyx = NyxWorld.get(world);
+                if (nyx != null) {
+                    PacketNyxWorld packet = new PacketNyxWorld(nyx);
+                    PacketHandler.sendTo((EntityPlayerMP) entity, packet);
+                }
             }
         }
     }
@@ -96,9 +100,10 @@ public final class Events {
     @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
         World world = event.getWorld();
-        if (world.isRemote || !world.hasCapability(Registry.worldCapability, null))
+        if (world.isRemote)
             return;
-        if (!world.getCapability(Registry.worldCapability, null).isHarvestMoon)
+        NyxWorld nyx = NyxWorld.get(world);
+        if (nyx == null || !(nyx.currentEvent instanceof HarvestMoon))
             return;
         if (world.rand.nextDouble() <= Config.harvestMoonGrowthChance)
             event.setResult(Event.Result.ALLOW);
@@ -137,11 +142,10 @@ public final class Events {
             return;
 
         // Don't spawn mobs during harvest moon
-        if (Config.harvestMoon && entity.world.hasCapability(Registry.worldCapability, null)) {
-            NyxWorld world = entity.world.getCapability(Registry.worldCapability, null);
-            if (world.isHarvestMoon && event.getSpawner() == null) {
+        if (Config.harvestMoon && event.getSpawner() == null) {
+            NyxWorld nyx = NyxWorld.get(entity.world);
+            if (nyx != null && nyx.currentEvent instanceof HarvestMoon)
                 event.setResult(Event.Result.DENY);
-            }
         }
     }
 

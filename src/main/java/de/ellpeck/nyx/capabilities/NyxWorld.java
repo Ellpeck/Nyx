@@ -1,17 +1,16 @@
 package de.ellpeck.nyx.capabilities;
 
-import de.ellpeck.nyx.Config;
-import de.ellpeck.nyx.Nyx;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.lunarevents.HarvestMoon;
+import de.ellpeck.nyx.lunarevents.LunarEvent;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -25,77 +24,80 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
     public static float moonPhase;
 
+    public final BiMap<String, LunarEvent> lunarEvents = HashBiMap.create();
     public final World world;
-    public boolean isHarvestMoon;
-    public float harvestMoonSkyModifier;
-   
+    public float eventSkyModifier;
+    public LunarEvent currentEvent;
+
     private boolean wasDaytime;
 
     public NyxWorld(World world) {
         this.world = world;
+        this.lunarEvents.put("harvest_moon", new HarvestMoon(this));
     }
 
     public void update() {
+        // TODO allowed dimensions
         if (this.world.provider.getDimensionType() != DimensionType.OVERWORLD)
             return;
 
         moonPhase = this.world.getCurrentMoonPhaseFactor();
+        if (this.currentEvent != null)
+            this.currentEvent.update();
 
         if (!this.world.isRemote) {
             boolean isDirty = false;
 
-            if (Config.harvestMoon) {
-                if (this.shouldHarvestMoonStart()) {
-                    this.isHarvestMoon = true;
+            if (this.currentEvent == null) {
+                for (LunarEvent event : this.lunarEvents.values()) {
+                    if (!event.shouldStart(this.wasDaytime))
+                        continue;
+
+                    this.currentEvent = event;
                     isDirty = true;
 
-                    ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".harvest_moon")
-                            .setStyle(new Style().setColor(TextFormatting.BLUE).setItalic(true));
+                    ITextComponent text = event.getStartMessage();
                     for (EntityPlayer player : this.world.playerEntities)
                         player.sendMessage(text);
+
+                    break;
                 }
-                this.wasDaytime = this.world.isDaytime();
-                if (this.wasDaytime && this.isHarvestMoon) {
-                    this.isHarvestMoon = false;
-                    isDirty = true;
-                }
+            }
+
+            if (this.currentEvent != null && this.currentEvent.shouldStop(this.wasDaytime)) {
+                this.currentEvent = null;
+                isDirty = true;
             }
 
             if (isDirty) {
                 for (EntityPlayer player : this.world.playerEntities)
                     PacketHandler.sendTo(player, new PacketNyxWorld(this));
             }
+
+            this.wasDaytime = this.world.isDaytime();
         } else {
-            if (this.isHarvestMoon) {
-                if (this.harvestMoonSkyModifier < 1)
-                    this.harvestMoonSkyModifier += 0.01F;
+            if (this.currentEvent != null && this.currentEvent.getSkyColor() != 0) {
+                if (this.eventSkyModifier < 1)
+                    this.eventSkyModifier += 0.01F;
             } else {
-                if (this.harvestMoonSkyModifier > 0)
-                    this.harvestMoonSkyModifier -= 0.01F;
+                if (this.eventSkyModifier > 0)
+                    this.eventSkyModifier -= 0.01F;
             }
         }
-    }
-
-    private boolean shouldHarvestMoonStart() {
-        if (this.world.getCurrentMoonPhaseFactor() < 1)
-            return false;
-        // check if it just turned night time
-        if (!this.wasDaytime || this.world.isDaytime())
-            return false;
-        return this.world.rand.nextDouble() <= Config.harvestMoonChance;
     }
 
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setBoolean("harvest_moon", this.isHarvestMoon);
+        if (this.currentEvent != null)
+            compound.setString("event", this.lunarEvents.inverse().get(this.currentEvent));
         compound.setBoolean("was_daytime", this.wasDaytime);
         return compound;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound compound) {
-        this.isHarvestMoon = compound.getBoolean("harvest_moon");
+        this.currentEvent = this.lunarEvents.get(compound.getString("event"));
         this.wasDaytime = compound.getBoolean("was_daytime");
     }
 
@@ -108,5 +110,11 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == Registry.worldCapability ? (T) this : null;
+    }
+
+    public static NyxWorld get(World world) {
+        if (world.hasCapability(Registry.worldCapability, null))
+            return world.getCapability(Registry.worldCapability, null);
+        return null;
     }
 }
