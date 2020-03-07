@@ -1,12 +1,15 @@
 package de.ellpeck.nyx;
 
+import com.google.common.collect.Sets;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
+import java.util.Set;
 
 public final class Config {
 
     public static Configuration instance;
+    public static Set<String> allowedDimensions;
     public static boolean enchantments;
     public static boolean lunarWater;
     public static boolean harvestMoon;
@@ -28,6 +31,7 @@ public final class Config {
     }
 
     public static void load() {
+        allowedDimensions = Sets.newHashSet(instance.get(Configuration.CATEGORY_GENERAL, "allowedDimensions", new String[]{"overworld"}, "Names of the dimensions that lunar events should occur in").getStringList());
         enchantments = instance.get(Configuration.CATEGORY_GENERAL, "enchantments", true, "If the enchantments should be enabled").getBoolean();
         lunarWater = instance.get(Configuration.CATEGORY_GENERAL, "lunarWater", true, "If lunar water should be enabled").getBoolean();
         harvestMoon = instance.get(Configuration.CATEGORY_GENERAL, "harvestMoon", true, "If the harvest moon should be enabled").getBoolean();

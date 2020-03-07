@@ -2,6 +2,7 @@ package de.ellpeck.nyx.capabilities;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.lunarevents.LunarEvent;
@@ -37,8 +38,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     }
 
     public void update() {
-        // TODO allowed dimensions
-        if (this.world.provider.getDimensionType() != DimensionType.OVERWORLD)
+        String dimension = this.world.provider.getDimensionType().getName();
+        if (!Config.allowedDimensions.contains(dimension))
             return;
 
         moonPhase = this.world.getCurrentMoonPhaseFactor();
