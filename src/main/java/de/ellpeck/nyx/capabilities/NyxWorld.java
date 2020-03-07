@@ -28,6 +28,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public final World world;
     public boolean isHarvestMoon;
     public float harvestMoonSkyModifier;
+   
     private boolean wasDaytime;
 
     public NyxWorld(World world) {

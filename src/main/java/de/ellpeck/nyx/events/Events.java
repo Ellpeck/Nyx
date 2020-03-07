@@ -5,6 +5,7 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.block.Block;
@@ -60,8 +61,24 @@ public final class Events {
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if (event.phase != TickEvent.Phase.START)
             return;
-        if (event.world.hasCapability(Registry.worldCapability, null))
-            event.world.getCapability(Registry.worldCapability, null).update();
+        if (!event.world.hasCapability(Registry.worldCapability, null))
+            return;
+        NyxWorld data = event.world.getCapability(Registry.worldCapability, null);
+        data.update();
+
+        // Falling stars
+        if (!event.world.isRemote && Config.fallingStars && !event.world.isDaytime() && event.world.getTotalWorldTime() % 20 == 0) {
+            for (EntityPlayer player : event.world.playerEntities) {
+                if (event.world.rand.nextFloat() > Config.fallingStarRarity)
+                    continue;
+                BlockPos startPos = player.getPosition().add(event.world.rand.nextGaussian() * 20, 0, event.world.rand.nextGaussian() * 20);
+                startPos = event.world.getHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));
+
+                FallingStar star = new FallingStar(event.world);
+                star.setPosition(startPos.getX(), startPos.getY(), startPos.getZ());
+                event.world.spawnEntity(star);
+            }
+        }
     }
 
     @SubscribeEvent

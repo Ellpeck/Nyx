@@ -7,6 +7,7 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
 import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -25,6 +26,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public final class Registry {
 
     public static Item lunarWaterBottle;
     public static Item cometShard;
+    public static Item fallenStar;
 
     public static SoundEvent lunarWaterSound;
 
@@ -80,9 +83,12 @@ public final class Registry {
 
     @SubscribeEvent
     public static void onItemRegistry(RegistryEvent.Register<Item> event) {
+        IForgeRegistry<Item> reg = event.getRegistry();
         if (Config.lunarWater)
-            event.getRegistry().register(lunarWaterBottle = new LunarWaterBottle());
-        event.getRegistry().register(cometShard = initItem(new Item(), "comet_shard"));
+            reg.register(lunarWaterBottle = new LunarWaterBottle());
+        reg.register(cometShard = initItem(new Item(), "comet_shard"));
+        if (Config.fallingStars)
+            reg.register(fallenStar = initItem(new Item(), "fallen_star"));
     }
 
     @SubscribeEvent
@@ -95,6 +101,8 @@ public final class Registry {
     public static void init() {
         if (Config.lunarWater)
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "cauldron_tracker"), CauldronTracker.class, Nyx.ID + ".cauldron_tracker", 0, Nyx.instance, 64, 20, false);
+        if (Config.fallingStars)
+            EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_star"), FallingStar.class, Nyx.ID + ".falling_star", 1, Nyx.instance, 128, 1, true);
 
         CapabilityManager.INSTANCE.register(NyxWorld.class, new Capability.IStorage<NyxWorld>() {
             @Nullable
