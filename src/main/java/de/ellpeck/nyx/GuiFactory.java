@@ -11,6 +11,7 @@ import net.minecraftforge.fml.client.config.IConfigElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GuiFactory implements IModGuiFactory {
 
@@ -41,7 +42,9 @@ public class GuiFactory implements IModGuiFactory {
         }
 
         private static List<IConfigElement> getConfigElements() {
-            return Collections.singletonList(new ConfigElement(Config.instance.getCategory(Configuration.CATEGORY_GENERAL)));
+            return Config.instance.getCategoryNames().stream()
+                    .map(e -> new ConfigElement(Config.instance.getCategory(e)))
+                    .collect(Collectors.toList());
         }
     }
 }
