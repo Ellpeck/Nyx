@@ -7,6 +7,7 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
+import de.ellpeck.nyx.lunarevents.StarShower;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.block.Block;
@@ -70,7 +71,8 @@ public final class Events {
         // Falling stars
         if (!event.world.isRemote && Config.fallingStars && !event.world.isDaytime() && event.world.getTotalWorldTime() % 20 == 0) {
             for (EntityPlayer player : event.world.playerEntities) {
-                if (event.world.rand.nextFloat() > Config.fallingStarRarity)
+                float chanceMult = data.currentEvent instanceof StarShower ? 15 : 1;
+                if (event.world.rand.nextFloat() > Config.fallingStarRarity * chanceMult)
                     continue;
                 BlockPos startPos = player.getPosition().add(event.world.rand.nextGaussian() * 20, 0, event.world.rand.nextGaussian() * 20);
                 startPos = event.world.getHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));

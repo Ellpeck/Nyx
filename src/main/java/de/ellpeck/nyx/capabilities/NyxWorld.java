@@ -6,6 +6,7 @@ import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.lunarevents.LunarEvent;
+import de.ellpeck.nyx.lunarevents.StarShower;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,6 +37,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public NyxWorld(World world) {
         this.world = world;
         this.lunarEvents.put("harvest_moon", new HarvestMoon(this));
+        this.lunarEvents.put("star_shower", new StarShower(this));
     }
 
     public void update() {

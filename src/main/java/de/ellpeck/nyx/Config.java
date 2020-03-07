@@ -23,6 +23,8 @@ public final class Config {
     public static boolean fallingStars;
     public static double fallingStarRarity;
     public static int nightTicks;
+    public static boolean starShowers;
+    public static double starShowerRarity;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -49,6 +51,8 @@ public final class Config {
 
         fallingStars = instance.get("fallingStars", "fallingStars", true, "If falling stars should be enabled").getBoolean();
         fallingStarRarity = instance.get("fallingStars", "fallingStarRarity", 0.01F, "The chance in percent (1 = 100%) for a falling star to appear at night for each player each second", 0, 1).getDouble();
+        starShowers = instance.get("fallingStars", "starShowers", true, "If star showers should be enabled").getBoolean();
+        starShowerRarity = instance.get("fallingStars", "starShowerRarity", 0.05, "The chance in percent (1 = 100%) of a star shower occuring on any given night").getDouble();
 
         if (instance.hasChanged())
             instance.save();
