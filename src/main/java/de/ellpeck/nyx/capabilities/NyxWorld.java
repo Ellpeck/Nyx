@@ -28,6 +28,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public final BiMap<String, LunarEvent> lunarEvents = HashBiMap.create();
     public final World world;
     public float eventSkyModifier;
+    public int currentSkyColor;
     public LunarEvent currentEvent;
 
     private boolean wasDaytime;
@@ -77,7 +78,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
             this.wasDaytime = this.world.isDaytime();
         } else {
-            if (this.currentEvent != null && this.currentEvent.getSkyColor() != 0) {
+            if (this.currentEvent != null && this.currentSkyColor != 0) {
                 if (this.eventSkyModifier < 1)
                     this.eventSkyModifier += 0.01F;
             } else {
@@ -99,6 +100,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     @Override
     public void deserializeNBT(NBTTagCompound compound) {
         this.currentEvent = this.lunarEvents.get(compound.getString("event"));
+        if (this.currentEvent != null)
+            this.currentSkyColor = this.currentEvent.getSkyColor();
         this.wasDaytime = compound.getBoolean("was_daytime");
     }
 

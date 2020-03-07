@@ -86,14 +86,11 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onFogRender(EntityViewRenderEvent.FogColors event) {
         NyxWorld world = NyxWorld.get(Minecraft.getMinecraft().world);
-        if (world == null || world.currentEvent == null)
+        if (world == null || world.currentSkyColor == 0)
             return;
-        int color = world.currentEvent.getSkyColor();
-        if (color == 0)
-            return;
-        event.setRed(lerp(event.getRed(), (color >> 16 & 255) / 255F, world.eventSkyModifier));
-        event.setGreen(lerp(event.getGreen(), (color >> 8 & 255) / 255F, world.eventSkyModifier));
-        event.setBlue(lerp(event.getBlue(), (color & 255) / 255F, world.eventSkyModifier));
+        event.setRed(lerp(event.getRed(), (world.currentSkyColor >> 16 & 255) / 255F, world.eventSkyModifier));
+        event.setGreen(lerp(event.getGreen(), (world.currentSkyColor >> 8 & 255) / 255F, world.eventSkyModifier));
+        event.setBlue(lerp(event.getBlue(), (world.currentSkyColor & 255) / 255F, world.eventSkyModifier));
     }
 
     @SubscribeEvent
