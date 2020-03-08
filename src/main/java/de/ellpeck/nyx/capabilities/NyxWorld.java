@@ -46,8 +46,6 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
             return;
 
         moonPhase = this.world.getCurrentMoonPhaseFactor();
-        if (this.currentEvent != null)
-            this.currentEvent.update();
 
         if (!this.world.isRemote) {
             boolean isDirty = false;
