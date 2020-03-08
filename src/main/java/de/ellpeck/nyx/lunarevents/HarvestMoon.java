@@ -40,4 +40,9 @@ public class HarvestMoon extends LunarEvent {
     public int getSkyColor() {
         return 0x3f3fc0;
     }
+
+    @Override
+    public String getMoonTexture() {
+        return "harvest_moon";
+    }
 }

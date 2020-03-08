@@ -21,4 +21,8 @@ public abstract class LunarEvent {
     public abstract boolean shouldStop(boolean lastDaytime);
 
     public abstract int getSkyColor();
+
+    public String getMoonTexture() {
+        return null;
+    }
 }

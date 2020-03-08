@@ -12,6 +12,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
@@ -31,15 +32,19 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Mod.EventBusSubscriber(modid = Nyx.ID, value = Side.CLIENT)
 public final class ClientEvents {
+
+    private static String lastMoonTextures;
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
@@ -76,10 +81,24 @@ public final class ClientEvents {
         if (event.phase != TickEvent.Phase.START)
             return;
         World world = Minecraft.getMinecraft().world;
-        if (world != null) {
-            NyxWorld nyx = NyxWorld.get(world);
-            if (nyx != null)
-                nyx.update();
+        if (world == null)
+            return;
+        NyxWorld nyx = NyxWorld.get(world);
+        if (nyx == null)
+            return;
+        nyx.update();
+
+        String moonTex = nyx.currentEvent != null ? nyx.currentEvent.getMoonTexture() : null;
+        if (!Objects.equals(moonTex, lastMoonTextures)) {
+            lastMoonTextures = moonTex;
+
+            ResourceLocation res = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, null, "field_110927_h");
+            ObfuscationReflectionHelper.setPrivateValue(ResourceLocation.class, res,
+                    moonTex == null ? "minecraft" : Nyx.ID,
+                    "field_110626_a");
+            ObfuscationReflectionHelper.setPrivateValue(ResourceLocation.class, res,
+                    moonTex == null ? "textures/environment/moon_phases.png" : "textures/moon/" + moonTex + ".png",
+                    "field_110625_b");
         }
     }
 
