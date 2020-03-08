@@ -2,5 +2,13 @@
     "lunar_water": {
         "category": "block",
         "sounds": ["nyx:lunar_water"]
+    },
+    "falling_star": {
+        "category": "ambient",
+        "sounds": ["nyx:falling_star"]
+    },
+    "falling_star_impact": {
+        "category": "ambient",
+        "sounds": ["nyx:falling_star_impact"]
     }
 }

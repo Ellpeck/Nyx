@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -37,10 +38,15 @@ public class FallingStar extends Entity {
             this.move(MoverType.SELF, this.trajectoryX, this.trajectoryY, this.trajectoryZ);
 
             if (this.collided) {
+                this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarImpactSound, SoundCategory.AMBIENT, 10, 1);
+
                 Item result = this.world.rand.nextDouble() <= Config.cometShardChance ? Registry.cometShard : Registry.fallenStar;
                 EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(result));
                 this.world.spawnEntity(item);
                 this.setDead();
+            } else {
+                if (this.ticksExisted % 40 == 0)
+                    this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarSound, SoundCategory.AMBIENT, 8, 1);
             }
         } else {
             for (int i = 0; i < 2; i++) {
