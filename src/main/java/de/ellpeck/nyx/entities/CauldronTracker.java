@@ -2,6 +2,8 @@ package de.ellpeck.nyx.entities;
 
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.capabilities.NyxWorld;
+import de.ellpeck.nyx.lunarevents.FullMoon;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
@@ -70,7 +72,8 @@ public class CauldronTracker extends Entity {
                 return;
             }
 
-            if (this.world.isDaytime() || this.world.getCurrentMoonPhaseFactor() < 1 || !this.world.canSeeSky(this.trackingPos)) {
+            NyxWorld nyx = NyxWorld.get(this.world);
+            if (nyx == null || !(nyx.currentEvent instanceof FullMoon) || !this.world.canSeeSky(this.trackingPos)) {
                 this.timer = 0;
                 return;
             }

@@ -8,33 +8,28 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-public class StarShower extends LunarEvent {
-    public StarShower(NyxWorld nyxWorld) {
-        super("star_shower", nyxWorld);
+public class FullMoon extends LunarEvent {
+    public FullMoon(NyxWorld nyxWorld) {
+        super("full_moon", nyxWorld);
     }
 
     @Override
     public ITextComponent getStartMessage() {
-        return new TextComponentTranslation("info." + Nyx.ID + ".star_shower")
-                .setStyle(new Style().setColor(TextFormatting.GOLD).setItalic(true));
+        return new TextComponentTranslation("info." + Nyx.ID + ".full_moon")
+                .setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
     }
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (!Config.starShowers)
+        if (!Config.fullMoon)
             return false;
         if (!lastDaytime || this.world.isDaytime())
             return false;
-        return this.world.rand.nextDouble() <= Config.starShowerRarity;
+        return this.world.getCurrentMoonPhaseFactor() >= 1;
     }
 
     @Override
     public boolean shouldStop(boolean lastDaytime) {
         return this.world.isDaytime();
-    }
-
-    @Override
-    public int getSkyColor() {
-        return 0xdec25f;
     }
 }

@@ -72,7 +72,7 @@ public final class ClientEvents {
         event.getLeft().add("");
         NyxWorld world = NyxWorld.get(mc.world);
         String pre = TextFormatting.GREEN + "[" + Nyx.NAME + "]" + TextFormatting.RESET;
-        String name = world.currentEvent == null ? "None" : world.lunarEvents.inverse().get(world.currentEvent);
+        String name = world.currentEvent == null ? "None" : world.currentEvent.name;
         event.getLeft().add(pre + " CurrEvent: " + name);
     }
 

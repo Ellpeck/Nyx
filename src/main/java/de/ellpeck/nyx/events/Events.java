@@ -6,6 +6,8 @@ import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
+import de.ellpeck.nyx.entities.WolfAiFullMoon;
+import de.ellpeck.nyx.lunarevents.FullMoon;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.lunarevents.StarShower;
 import de.ellpeck.nyx.network.PacketHandler;
@@ -23,6 +25,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityElderGuardian;
 import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -87,15 +90,19 @@ public final class Events {
     @SubscribeEvent
     public static void onPlayerJoin(EntityJoinWorldEvent event) {
         Entity entity = event.getEntity();
+        World world = entity.getEntityWorld();
+        if (world.isRemote)
+            return;
+        NyxWorld nyx = NyxWorld.get(world);
+        if (nyx == null)
+            return;
+
         if (entity instanceof EntityPlayerMP) {
-            World world = entity.getEntityWorld();
-            if (!world.isRemote) {
-                NyxWorld nyx = NyxWorld.get(world);
-                if (nyx != null) {
-                    PacketNyxWorld packet = new PacketNyxWorld(nyx);
-                    PacketHandler.sendTo((EntityPlayerMP) entity, packet);
-                }
-            }
+            PacketNyxWorld packet = new PacketNyxWorld(nyx);
+            PacketHandler.sendTo((EntityPlayerMP) entity, packet);
+        } else if (entity instanceof EntityWolf) {
+            EntityWolf wolf = (EntityWolf) entity;
+            wolf.targetTasks.addTask(3, new WolfAiFullMoon(wolf));
         }
     }
 
@@ -156,7 +163,8 @@ public final class Events {
         EntityLivingBase entity = event.getEntityLiving();
         if (!(entity instanceof IMob))
             return;
-        if (entity.world.getCurrentMoonPhaseFactor() < 1)
+        NyxWorld nyx = NyxWorld.get(entity.world);
+        if (nyx == null || !(nyx.currentEvent instanceof FullMoon))
             return;
 
         // Set random effect

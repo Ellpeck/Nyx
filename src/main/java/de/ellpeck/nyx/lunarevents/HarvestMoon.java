@@ -10,7 +10,7 @@ import net.minecraft.util.text.TextFormatting;
 
 public class HarvestMoon extends LunarEvent {
     public HarvestMoon(NyxWorld nyxWorld) {
-        super(nyxWorld);
+        super("harvest_moon", nyxWorld);
     }
 
     @Override

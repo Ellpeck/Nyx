@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.lunarevents.FullMoon;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.lunarevents.LunarEvent;
 import de.ellpeck.nyx.lunarevents.StarShower;
@@ -21,23 +22,28 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
 
     public static float moonPhase;
 
-    public final BiMap<String, LunarEvent> lunarEvents = HashBiMap.create();
     public final World world;
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
 
+    private final List<LunarEvent> lunarEvents = new ArrayList<>();
     private boolean wasDaytime;
 
     public NyxWorld(World world) {
         this.world = world;
-        this.lunarEvents.put("harvest_moon", new HarvestMoon(this));
-        this.lunarEvents.put("star_shower", new StarShower(this));
+        this.lunarEvents.add(new HarvestMoon(this));
+        this.lunarEvents.add(new StarShower(this));
+        // this needs to stay at the end to prioritize random events
+        this.lunarEvents.add(new FullMoon(this));
     }
 
     public void update() {
@@ -51,7 +57,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
             boolean isDirty = false;
 
             if (this.currentEvent == null) {
-                for (LunarEvent event : this.lunarEvents.values()) {
+                for (LunarEvent event : this.lunarEvents) {
                     if (!event.shouldStart(this.wasDaytime))
                         continue;
 
@@ -92,14 +98,15 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = new NBTTagCompound();
         if (this.currentEvent != null)
-            compound.setString("event", this.lunarEvents.inverse().get(this.currentEvent));
+            compound.setString("event", this.currentEvent.name);
         compound.setBoolean("was_daytime", this.wasDaytime);
         return compound;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound compound) {
-        this.currentEvent = this.lunarEvents.get(compound.getString("event"));
+        String name = compound.getString("event");
+        this.currentEvent = this.lunarEvents.stream().filter(e -> e.name.equals(name)).findFirst().orElse(null);
         if (this.currentEvent != null)
             this.currentSkyColor = this.currentEvent.getSkyColor();
         this.wasDaytime = compound.getBoolean("was_daytime");
