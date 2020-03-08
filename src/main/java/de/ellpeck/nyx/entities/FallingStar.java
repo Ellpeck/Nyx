@@ -1,9 +1,11 @@
 package de.ellpeck.nyx.entities;
 
+import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
@@ -35,7 +37,8 @@ public class FallingStar extends Entity {
             this.move(MoverType.SELF, this.trajectoryX, this.trajectoryY, this.trajectoryZ);
 
             if (this.collided) {
-                EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(Registry.fallenStar));
+                Item result = this.world.rand.nextDouble() <= Config.cometShardChance ? Registry.cometShard : Registry.fallenStar;
+                EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(result));
                 this.world.spawnEntity(item);
                 this.setDead();
             }
