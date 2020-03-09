@@ -38,6 +38,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -45,6 +46,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -105,12 +107,8 @@ public final class Events {
         EntityLivingBase entity = event.getEntityLiving();
         // Delet monsters spawned by blood moon
         if (!entity.world.isRemote && entity.world.isDaytime() && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn")) {
-            PotionEffect active = entity.getActivePotionEffect(MobEffects.WITHER);
-            if (active == null) {
-                entity.addPotionEffect(new PotionEffect(MobEffects.WITHER, 600, 2));
-            } else if (active.getDuration() < 10) {
-                entity.setDead();
-            }
+            ((WorldServer) entity.world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, entity.posX, entity.posY, entity.posZ, 10, 0.5, 1, 0.5, 0);
+            entity.setDead();
         }
     }
 
