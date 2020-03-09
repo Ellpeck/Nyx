@@ -1,7 +1,9 @@
 package de.ellpeck.nyx.entities;
 
 import de.ellpeck.nyx.Config;
+import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityItem;
@@ -10,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -42,7 +45,9 @@ public class FallingStar extends Entity {
 
                 Item result = this.world.rand.nextDouble() <= Config.cometShardChance ? Registry.cometShard : Registry.fallenStar;
                 EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(result));
+                item.getEntityData().setBoolean(Nyx.ID + ":fallen_star", true);
                 this.world.spawnEntity(item);
+                this.placeStarAir();
                 this.setDead();
             } else {
                 if (this.ticksExisted % 40 == 0)
@@ -57,6 +62,26 @@ public class FallingStar extends Entity {
             }
         }
         super.onEntityUpdate();
+    }
+
+    private void placeStarAir() {
+        BlockPos pos = this.getPosition();
+        if (this.world.getBlockState(pos).getBlock().isReplaceable(this.world, pos)) {
+            this.world.setBlockState(pos, Registry.starAir.getDefaultState());
+            return;
+        }
+
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos offset = pos.add(x, y, z);
+                    if (this.world.getBlockState(offset).getBlock().isReplaceable(this.world, offset)) {
+                        this.world.setBlockState(offset, Registry.starAir.getDefaultState());
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     @Override

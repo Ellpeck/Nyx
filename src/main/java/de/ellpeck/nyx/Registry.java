@@ -3,6 +3,7 @@ package de.ellpeck.nyx;
 import de.ellpeck.nyx.blocks.LunarWater;
 import de.ellpeck.nyx.blocks.LunarWaterCauldron;
 import de.ellpeck.nyx.blocks.LunarWaterFluid;
+import de.ellpeck.nyx.blocks.StarAir;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
@@ -55,6 +56,7 @@ public final class Registry {
 
     public static Block lunarWater;
     public static Block lunarWaterCauldron;
+    public static Block starAir;
 
     public static Fluid lunarWaterFluid;
 
@@ -78,17 +80,20 @@ public final class Registry {
 
     @SubscribeEvent
     public static void onBlockRegistry(RegistryEvent.Register<Block> event) {
+        IForgeRegistry<Block> reg = event.getRegistry();
         if (Config.lunarWater) {
             Fluid fluid = new LunarWaterFluid();
             FluidRegistry.registerFluid(fluid);
             FluidRegistry.addBucketForFluid(fluid);
             lunarWaterFluid = FluidRegistry.getFluid(fluid.getName());
 
-            event.getRegistry().registerAll(
+            reg.registerAll(
                     lunarWater = new LunarWater(lunarWaterFluid),
                     lunarWaterCauldron = new LunarWaterCauldron()
             );
         }
+        if (Config.fallingStars)
+            reg.register(starAir = new StarAir());
     }
 
     @SubscribeEvent
@@ -137,5 +142,11 @@ public final class Registry {
         item.setCreativeTab(CREATIVE_TAB);
         MOD_ITEMS.add(item);
         return item;
+    }
+
+    public static Block initBlock(Block block, String name) {
+        block.setRegistryName(new ResourceLocation(Nyx.ID, name));
+        block.setTranslationKey(Nyx.ID + "." + block.getRegistryName().getPath());
+        return block;
     }
 }
