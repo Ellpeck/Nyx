@@ -44,6 +44,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEntitySpawner;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -221,16 +222,11 @@ public final class Events {
             }
 
             // Spawn a second one
-            if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0) {
-                String key = Nyx.ID + ":added_spawn";
-                if (!entity.getEntityData().getBoolean(key)) {
-                    ResourceLocation name = EntityList.getKey(entity);
-                    if (name != null) {
-                        Entity spawned = spawnEntity(entity.world, entity.posX, entity.posY, entity.posZ, name);
-                        if (spawned != null)
-                            spawned.getEntityData().setBoolean(key, true);
-                    }
-                }
+            if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0)
+                doExtraSpawn(entity);
+        } else if (nyx.currentEvent instanceof BloodMoon && event.getSpawner() == null) {
+            for (int i = 1; i < Config.bloodMoonSpawnMultiplier; i++) {
+                doExtraSpawn(entity);
             }
         }
     }
@@ -323,18 +319,35 @@ public final class Events {
             event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
     }
 
-    private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {
-        Entity entity = EntityList.createEntityByIDFromName(name, world);
-        if (!(entity instanceof EntityLiving))
-            return null;
-        EntityLiving living = (EntityLiving) entity;
-        entity.setLocationAndAngles(x, y, z, MathHelper.wrapDegrees(world.rand.nextFloat() * 360), 0);
-        living.rotationYawHead = living.rotationYaw;
-        living.renderYawOffset = living.rotationYaw;
-        if (ForgeEventFactory.doSpecialSpawn(living, world, (float) x, (float) y, (float) z, null))
-            return null;
-        living.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(living)), null);
-        world.spawnEntity(entity);
-        return entity;
+    private static void doExtraSpawn(Entity original) {
+        String addedSpawnKey = Nyx.ID + ":added_spawn";
+        if (!original.getEntityData().getBoolean(addedSpawnKey)) {
+            ResourceLocation name = EntityList.getKey(original);
+            if (name != null) {
+                for (int x = -2; x <= 2; x++) {
+                    for (int y = -2; y <= 2; y++) {
+                        for (int z = -2; z <= 2; z++) {
+                            if (x == 0 && y == 0 && z == 0)
+                                continue;
+                            BlockPos offset = original.getPosition().add(x, y, z);
+                            if (!WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, original.world, offset))
+                                continue;
+                            Entity entity = EntityList.createEntityByIDFromName(name, original.world);
+                            if (!(entity instanceof EntityLiving))
+                                return;
+                            EntityLiving living = (EntityLiving) entity;
+                            entity.setLocationAndAngles(original.posX + x, original.posY + y, original.posZ + z, MathHelper.wrapDegrees(original.world.rand.nextFloat() * 360), 0);
+                            living.rotationYawHead = living.rotationYaw;
+                            living.renderYawOffset = living.rotationYaw;
+                            living.getEntityData().setBoolean(addedSpawnKey, true);
+                            if (!ForgeEventFactory.doSpecialSpawn(living, original.world, (float) original.posX + x, (float) original.posY + y, (float) original.posZ + z, null))
+                                living.onInitialSpawn(original.world.getDifficultyForLocation(new BlockPos(living)), null);
+                            original.world.spawnEntity(entity);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

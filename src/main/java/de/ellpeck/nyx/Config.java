@@ -30,6 +30,7 @@ public final class Config {
     public static boolean bloodMoon;
     public static double bloodMoonChance;
     public static boolean bloodMoonSleeping;
+    public static int bloodMoonSpawnMultiplier;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -64,6 +65,7 @@ public final class Config {
         bloodMoon = instance.get("bloodMoon", "bloodMoon", true, "If the blood moon should be enabled").getBoolean();
         bloodMoonChance = instance.get("bloodMoon", "bloodMoonChance", 0.05, "The chance in percent (1 = 100%) of the blood moon occuring on a full moon night", 0, 1).getDouble();
         bloodMoonSleeping = instance.get("bloodMoon", "bloodMoonSleeping", false, "If sleeping is allowed during a blood moon").getBoolean();
+        bloodMoonSpawnMultiplier = instance.get("bloodMoon", "bloodMoonSpawnMultiplier", 2, "The multiplier with which mobs should spawn during the blood moon (eg 2 means 2 mobs spawn instead of 1)", 1, 1000).getInt();
 
         if (instance.hasChanged())
             instance.save();
