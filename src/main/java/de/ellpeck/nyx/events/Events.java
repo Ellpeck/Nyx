@@ -54,14 +54,19 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 @EventBusSubscriber(modid = Nyx.ID)
 public final class Events {
+
+    private static final Method SET_SLIME_SIZE_METHOD = ObfuscationReflectionHelper.findMethod(EntitySlime.class, "func_70799_a", void.class, int.class, boolean.class);
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
@@ -165,35 +170,63 @@ public final class Events {
         if (!(entity instanceof IMob))
             return;
         NyxWorld nyx = NyxWorld.get(entity.world);
-        if (nyx == null || !(nyx.currentEvent instanceof FullMoon))
+        if (nyx == null)
             return;
 
-        // Set random effect
-        if (Config.addPotionEffects && !(entity instanceof EntityCreeper)) {
-            Potion effect = null;
-            int i = entity.world.rand.nextInt(20);
-            if (i <= 2) {
-                effect = MobEffects.SPEED;
-            } else if (i <= 4) {
-                effect = MobEffects.STRENGTH;
-            } else if (i <= 6) {
-                effect = MobEffects.REGENERATION;
-            } else if (i <= 7) {
-                effect = MobEffects.INVISIBILITY;
+        // Bigger slimes
+        if (entity instanceof EntitySlime) {
+            EntitySlime slime = (EntitySlime) entity;
+            int size = slime.getSlimeSize();
+            if (nyx.currentEvent instanceof FullMoon) {
+                int i = slime.world.rand.nextInt(5);
+                if (i <= 1)
+                    size += 2;
+                if (i <= 2)
+                    size += 2;
+            } else if (nyx.currentEvent instanceof HarvestMoon) {
+                int i = slime.world.rand.nextInt(12);
+                if (i < 6)
+                    size += i * 2;
             }
-            if (effect != null)
-                entity.addPotionEffect(new PotionEffect(effect, Integer.MAX_VALUE));
+            if (size != slime.getSlimeSize()) {
+                try {
+                    SET_SLIME_SIZE_METHOD.invoke(slime, size, true);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                // Cancelling this event just suppresses onInitialSpawn, doc is wrong
+                event.setCanceled(true);
+            }
         }
 
-        // Spawn a second one
-        if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0) {
-            String key = Nyx.ID + ":added_spawn";
-            if (!entity.getEntityData().getBoolean(key)) {
-                ResourceLocation name = EntityList.getKey(entity);
-                if (name != null) {
-                    Entity spawned = spawnEntity(entity.world, entity.posX, entity.posY, entity.posZ, name);
-                    if (spawned != null)
-                        spawned.getEntityData().setBoolean(key, true);
+        if (nyx.currentEvent instanceof FullMoon) {
+            // Set random effect
+            if (Config.addPotionEffects && !(entity instanceof EntityCreeper)) {
+                Potion effect = null;
+                int i = entity.world.rand.nextInt(20);
+                if (i <= 2) {
+                    effect = MobEffects.SPEED;
+                } else if (i <= 4) {
+                    effect = MobEffects.STRENGTH;
+                } else if (i <= 6) {
+                    effect = MobEffects.REGENERATION;
+                } else if (i <= 7) {
+                    effect = MobEffects.INVISIBILITY;
+                }
+                if (effect != null)
+                    entity.addPotionEffect(new PotionEffect(effect, Integer.MAX_VALUE));
+            }
+
+            // Spawn a second one
+            if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0) {
+                String key = Nyx.ID + ":added_spawn";
+                if (!entity.getEntityData().getBoolean(key)) {
+                    ResourceLocation name = EntityList.getKey(entity);
+                    if (name != null) {
+                        Entity spawned = spawnEntity(entity.world, entity.posX, entity.posY, entity.posZ, name);
+                        if (spawned != null)
+                            spawned.getEntityData().setBoolean(key, true);
+                    }
                 }
             }
         }
