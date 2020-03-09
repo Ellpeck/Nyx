@@ -45,7 +45,7 @@ public class BloodMoon extends LunarEvent {
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (this.world.getCurrentMoonPhaseFactor() < 1)
+        if (Config.bloodMoonOnFull && this.world.getCurrentMoonPhaseFactor() < 1)
             return false;
         if (!lastDaytime || this.world.isDaytime())
             return false;

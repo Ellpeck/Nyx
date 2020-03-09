@@ -30,6 +30,8 @@ public final class Config {
     public static boolean isMobDuplicationWhitelist;
     public static boolean bloodMoonVanish;
     public static int bloodMoonSpawnRadius;
+    public static boolean harvestMoonOnFull;
+    public static boolean bloodMoonOnFull;
     public static LunarEventConfig harvestMoon;
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
@@ -58,6 +60,7 @@ public final class Config {
 
         harvestMoon = new LunarEventConfig("harvestMoon", "harvestMoon", "Harvest Moon", 0.05);
         harvestMoonGrowthChance = instance.get("harvestMoon", "harvestMoonGrowthChance", 0.8, "The chance in percent (1 = 100%) for any crop to get an extra growth tick each random tick during the harvest moon", 0, 1).getDouble();
+        harvestMoonOnFull = instance.get("harvestMoon", "harvestMoonOnFull", false, "If the harvest moon should only occur on full moon nights").getBoolean();
 
         starShowers = new LunarEventConfig("fallingStars", "starShowers", "Star Showers", 0.05);
         fallingStars = instance.get("fallingStars", "fallingStars", true, "If falling stars should be enabled").getBoolean();
@@ -69,6 +72,7 @@ public final class Config {
         bloodMoonSpawnMultiplier = instance.get("bloodMoon", "bloodMoonSpawnMultiplier", 2, "The multiplier with which mobs should spawn during the blood moon (eg 2 means 2 mobs spawn instead of 1)", 1, 1000).getInt();
         bloodMoonVanish = instance.get("bloodMoon", "bloodMoonVanish", true, "If mobs spawned by the blood moon should die at sunup").getBoolean();
         bloodMoonSpawnRadius = instance.get("bloodMoon", "bloodMoonSpawnRadius", 20, "The closest distance that mobs can spawn away from a player during the blood moon. Vanilla value is 24.").getInt();
+        bloodMoonOnFull = instance.get("bloodMoon", "bloodMoonOnFull", false, "If the blood moon should only occur on full moon nights").getBoolean();
 
         if (instance.hasChanged())
             instance.save();

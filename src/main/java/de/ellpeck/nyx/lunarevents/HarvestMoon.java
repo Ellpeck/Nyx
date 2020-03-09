@@ -25,7 +25,7 @@ public class HarvestMoon extends LunarEvent {
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (this.world.getCurrentMoonPhaseFactor() < 1)
+        if (Config.harvestMoonOnFull && this.world.getCurrentMoonPhaseFactor() < 1)
             return false;
         if (!lastDaytime || this.world.isDaytime())
             return false;
