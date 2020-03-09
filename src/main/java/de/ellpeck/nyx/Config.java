@@ -26,7 +26,6 @@ public final class Config {
     public static double cometShardChance;
     public static boolean bloodMoonSleeping;
     public static int bloodMoonSpawnMultiplier;
-    public static boolean bloodMoonVanish;
     public static Set<String> mobDuplicationBlacklist;
     public static boolean isMobDuplicationWhitelist;
     public static LunarEventConfig harvestMoon;
@@ -66,7 +65,6 @@ public final class Config {
         bloodMoon = new LunarEventConfig("bloodMoon", "bloodMoon", "Blood Moon", 0.05);
         bloodMoonSleeping = instance.get("bloodMoon", "bloodMoonSleeping", false, "If sleeping is allowed during a blood moon").getBoolean();
         bloodMoonSpawnMultiplier = instance.get("bloodMoon", "bloodMoonSpawnMultiplier", 2, "The multiplier with which mobs should spawn during the blood moon (eg 2 means 2 mobs spawn instead of 1)", 1, 1000).getInt();
-        bloodMoonVanish = instance.get("bloodMoon", "bloodMoonVanish", false, "If mobs spawned by the blood moon should die at sunup").getBoolean();
 
         if (instance.hasChanged())
             instance.save();
