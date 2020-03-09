@@ -64,8 +64,10 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 @EventBusSubscriber(modid = Nyx.ID)
@@ -333,6 +335,10 @@ public final class Events {
         if (!original.getEntityData().getBoolean(addedSpawnKey)) {
             ResourceLocation name = EntityList.getKey(original);
             if (name != null) {
+                boolean listed = Config.mobDuplicationBlacklist.contains(name.toString());
+                if (Config.isMobDuplicationWhitelist != listed)
+                    return;
+
                 for (int x = -2; x <= 2; x++) {
                     for (int y = -2; y <= 2; y++) {
                         for (int z = -2; z <= 2; z++) {

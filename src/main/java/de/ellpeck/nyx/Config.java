@@ -27,6 +27,8 @@ public final class Config {
     public static boolean bloodMoonSleeping;
     public static int bloodMoonSpawnMultiplier;
     public static boolean bloodMoonVanish;
+    public static Set<String> mobDuplicationBlacklist;
+    public static boolean isMobDuplicationWhitelist;
     public static LunarEventConfig harvestMoon;
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
@@ -42,6 +44,8 @@ public final class Config {
         lunarWater = instance.get("general", "lunarWater", true, "If lunar water should be enabled").getBoolean();
         cometShardGuardianChance = instance.get("general", "cometShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a comet shard to be dropped from an elder guardian", 0, 1).getDouble();
         nightTicks = instance.get("general", "nightTicks", 10000, "The amount of ticks that an in-game night lasts for").getInt();
+        mobDuplicationBlacklist = Sets.newHashSet(instance.get("general", "mobDuplicationBlacklist", new String[0], "The registry names of entities that should not be spawned during the full and blood moons. If isMobDuplicationWhitelist is true, this acts as a whitelist instead.").getStringList());
+        isMobDuplicationWhitelist = instance.get("general", "isMobDuplicationWhitelist", false, "If the mobDuplicationBlacklist should act as a whitelist instead").getBoolean();
 
         fullMoon = instance.get("fullMoon", "fullMoon", true, "If the vanilla full moon should be considered a proper lunar event").getBoolean();
         addPotionEffects = instance.get("fullMoon", "addPotionEffects", true, "If mobs spawned during a full moon should have random potion effects applied to them (similarly to spiders in the base game)").getBoolean();
