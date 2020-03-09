@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityElderGuardian;
+import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -147,7 +148,7 @@ public final class Events {
     @SubscribeEvent
     public static void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
         EntityLivingBase entity = event.getEntityLiving();
-        if (!(entity instanceof IMob))
+        if (!(entity instanceof IMob) || entity instanceof EntitySlime)
             return;
 
         // Don't spawn mobs during harvest moon
