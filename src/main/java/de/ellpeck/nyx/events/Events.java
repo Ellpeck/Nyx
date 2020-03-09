@@ -106,7 +106,7 @@ public final class Events {
     public static void onLivingTick(LivingEvent.LivingUpdateEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
         // Delet monsters spawned by blood moon
-        if (!entity.world.isRemote && entity.world.isDaytime() && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn")) {
+        if (Config.bloodMoonVanish && !entity.world.isRemote && entity.world.isDaytime() && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn")) {
             ((WorldServer) entity.world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, entity.posX, entity.posY, entity.posZ, 10, 0.5, 1, 0.5, 0);
             entity.setDead();
         }
@@ -239,15 +239,6 @@ public final class Events {
             // Spawn a second one
             if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0)
                 doExtraSpawn(entity, "full_moon_spawn");
-        } else if (nyx.currentEvent instanceof BloodMoon && event.getSpawner() == null) {
-            for (int i = 1; i < Config.bloodMoonSpawnMultiplier; i++) {
-                EntityLiving ret = doExtraSpawn(entity, "blood_moon_spawn");
-                if (ret != null) {
-                    // Makes the extra entity not count towards the mob cap
-                    // It gets removed on sunrise so it doesn't matter that it's marked persistent
-                    ret.enablePersistence();
-                }
-            }
         }
     }
 
@@ -339,14 +330,14 @@ public final class Events {
             event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
     }
 
-    private static EntityLiving doExtraSpawn(Entity original, String key) {
+    private static void doExtraSpawn(Entity original, String key) {
         String addedSpawnKey = Nyx.ID + ":" + key;
         if (!original.getEntityData().getBoolean(addedSpawnKey)) {
             ResourceLocation name = EntityList.getKey(original);
             if (name != null) {
                 boolean listed = Config.mobDuplicationBlacklist.contains(name.toString());
                 if (Config.isMobDuplicationWhitelist != listed)
-                    return null;
+                    return;
 
                 for (int x = -2; x <= 2; x++) {
                     for (int y = -2; y <= 2; y++) {
@@ -358,7 +349,7 @@ public final class Events {
                                 continue;
                             Entity entity = EntityList.createEntityByIDFromName(name, original.world);
                             if (!(entity instanceof EntityLiving))
-                                return null;
+                                return;
                             EntityLiving living = (EntityLiving) entity;
                             entity.setLocationAndAngles(original.posX + x, original.posY + y, original.posZ + z, MathHelper.wrapDegrees(original.world.rand.nextFloat() * 360), 0);
                             living.rotationYawHead = living.rotationYaw;
@@ -367,12 +358,11 @@ public final class Events {
                             if (!ForgeEventFactory.doSpecialSpawn(living, original.world, (float) original.posX + x, (float) original.posY + y, (float) original.posZ + z, null))
                                 living.onInitialSpawn(original.world.getDifficultyForLocation(new BlockPos(living)), null);
                             original.world.spawnEntity(entity);
-                            return living;
+                            return;
                         }
                     }
                 }
             }
         }
-        return null;
     }
 }
