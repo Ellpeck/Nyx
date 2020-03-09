@@ -49,6 +49,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -95,6 +96,14 @@ public final class Events {
                 event.world.spawnEntity(star);
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(LivingEvent.LivingUpdateEvent event) {
+        EntityLivingBase entity = event.getEntityLiving();
+        // Delet monsters
+        if (!entity.world.isRemote && Config.bloodMoonVanish && entity.world.isDaytime() && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn"))
+            entity.setDead();
     }
 
     @SubscribeEvent
@@ -161,7 +170,7 @@ public final class Events {
             return;
 
         // Don't spawn mobs during harvest moon
-        if (Config.harvestMoon && event.getSpawner() == null) {
+        if (event.getSpawner() == null) {
             NyxWorld nyx = NyxWorld.get(entity.world);
             if (nyx != null && nyx.currentEvent instanceof HarvestMoon)
                 event.setResult(Event.Result.DENY);
@@ -223,10 +232,10 @@ public final class Events {
 
             // Spawn a second one
             if (Config.additionalMobsChance > 0 && entity.world.rand.nextInt(Config.additionalMobsChance) == 0)
-                doExtraSpawn(entity);
+                doExtraSpawn(entity, "full_moon_spawn");
         } else if (nyx.currentEvent instanceof BloodMoon && event.getSpawner() == null) {
             for (int i = 1; i < Config.bloodMoonSpawnMultiplier; i++) {
-                doExtraSpawn(entity);
+                doExtraSpawn(entity, "blood_moon_spawn");
             }
         }
     }
@@ -319,8 +328,8 @@ public final class Events {
             event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
     }
 
-    private static void doExtraSpawn(Entity original) {
-        String addedSpawnKey = Nyx.ID + ":added_spawn";
+    private static void doExtraSpawn(Entity original, String key) {
+        String addedSpawnKey = Nyx.ID + ":" + key;
         if (!original.getEntityData().getBoolean(addedSpawnKey)) {
             ResourceLocation name = EntityList.getKey(original);
             if (name != null) {

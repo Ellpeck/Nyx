@@ -3,12 +3,16 @@ package de.ellpeck.nyx.lunarevents;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.capabilities.NyxWorld;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 public class HarvestMoon extends LunarEvent {
+
+    private final ConfigImpl config = new ConfigImpl(() -> Config.harvestMoon);
+
     public HarvestMoon(NyxWorld nyxWorld) {
         super("harvest_moon", nyxWorld);
     }
@@ -21,14 +25,11 @@ public class HarvestMoon extends LunarEvent {
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (!Config.harvestMoon)
-            return false;
         if (this.world.getCurrentMoonPhaseFactor() < 1)
             return false;
-        // check if it just turned night time
         if (!lastDaytime || this.world.isDaytime())
             return false;
-        return this.world.rand.nextDouble() <= Config.harvestMoonChance;
+        return this.config.canStart();
     }
 
     @Override
@@ -44,5 +45,20 @@ public class HarvestMoon extends LunarEvent {
     @Override
     public String getMoonTexture() {
         return "harvest_moon";
+    }
+
+    @Override
+    public void update(boolean lastDaytime) {
+        this.config.update(lastDaytime);
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return this.config.serializeNBT();
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        this.config.deserializeNBT(nbt);
     }
 }

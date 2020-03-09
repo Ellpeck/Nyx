@@ -3,12 +3,16 @@ package de.ellpeck.nyx.lunarevents;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.capabilities.NyxWorld;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 public class StarShower extends LunarEvent {
+
+    private final ConfigImpl config = new ConfigImpl(() -> Config.starShowers);
+
     public StarShower(NyxWorld nyxWorld) {
         super("star_shower", nyxWorld);
     }
@@ -21,11 +25,9 @@ public class StarShower extends LunarEvent {
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (!Config.starShowers)
-            return false;
         if (!lastDaytime || this.world.isDaytime())
             return false;
-        return this.world.rand.nextDouble() <= Config.starShowerRarity;
+        return this.config.canStart();
     }
 
     @Override
@@ -36,5 +38,20 @@ public class StarShower extends LunarEvent {
     @Override
     public int getSkyColor() {
         return 0xdec25f;
+    }
+
+    @Override
+    public void update(boolean lastDaytime) {
+        this.config.update(lastDaytime);
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return this.config.serializeNBT();
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        this.config.deserializeNBT(nbt);
     }
 }

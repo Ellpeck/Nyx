@@ -3,12 +3,16 @@ package de.ellpeck.nyx.lunarevents;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.capabilities.NyxWorld;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 public class BloodMoon extends LunarEvent {
+
+    private final ConfigImpl config = new ConfigImpl(() -> Config.bloodMoon);
+
     public BloodMoon(NyxWorld nyxWorld) {
         super("blood_moon", nyxWorld);
     }
@@ -21,13 +25,11 @@ public class BloodMoon extends LunarEvent {
 
     @Override
     public boolean shouldStart(boolean lastDaytime) {
-        if (!Config.bloodMoon)
-            return false;
         if (this.world.getCurrentMoonPhaseFactor() < 1)
             return false;
         if (!lastDaytime || this.world.isDaytime())
             return false;
-        return this.world.rand.nextDouble() <= Config.bloodMoonChance;
+        return this.config.canStart();
     }
 
     @Override
@@ -43,5 +45,20 @@ public class BloodMoon extends LunarEvent {
     @Override
     public String getMoonTexture() {
         return "blood_moon";
+    }
+
+    @Override
+    public void update(boolean lastDaytime) {
+        this.config.update(lastDaytime);
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return this.config.serializeNBT();
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        this.config.deserializeNBT(nbt);
     }
 }

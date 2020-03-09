@@ -51,6 +51,9 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
         moonPhase = this.world.getCurrentMoonPhaseFactor();
 
+        for (LunarEvent event : this.lunarEvents)
+            event.update(this.wasDaytime);
+
         if (!this.world.isRemote) {
             boolean isDirty = false;
 
@@ -98,6 +101,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         if (this.currentEvent != null)
             compound.setString("event", this.currentEvent.name);
         compound.setBoolean("was_daytime", this.wasDaytime);
+        for (LunarEvent event : this.lunarEvents)
+            compound.setTag(event.name, event.serializeNBT());
         return compound;
     }
 
@@ -108,6 +113,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         if (this.currentEvent != null)
             this.currentSkyColor = this.currentEvent.getSkyColor();
         this.wasDaytime = compound.getBoolean("was_daytime");
+        for (LunarEvent event : this.lunarEvents)
+            event.deserializeNBT(compound.getCompoundTag(event.name));
     }
 
     @Override
