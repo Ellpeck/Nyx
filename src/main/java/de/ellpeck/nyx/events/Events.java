@@ -7,12 +7,14 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.entities.WolfAiFullMoon;
+import de.ellpeck.nyx.lunarevents.BloodMoon;
 import de.ellpeck.nyx.lunarevents.FullMoon;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import de.ellpeck.nyx.lunarevents.StarShower;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.state.IBlockState;
@@ -49,6 +51,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -245,6 +248,7 @@ public final class Events {
         BlockPos pos = event.getPos();
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
+        NyxWorld nyx = NyxWorld.get(world);
 
         ench:
         if (Config.disallowDayEnchanting) {
@@ -282,6 +286,9 @@ public final class Events {
             event.setCanceled(true);
             event.setCancellationResult(EnumActionResult.SUCCESS);
         }
+
+        if (nyx != null && nyx.currentEvent instanceof BloodMoon && !Config.bloodMoonSleeping && block instanceof BlockBed)
+            player.sendStatusMessage(new TextComponentTranslation("info." + Nyx.ID + ".blood_moon_sleeping"), true);
     }
 
     @SubscribeEvent
@@ -306,6 +313,14 @@ public final class Events {
     @SubscribeEvent
     public static void onWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         event.addCapability(new ResourceLocation(Nyx.ID, "world_cap"), new NyxWorld(event.getObject()));
+    }
+
+    @SubscribeEvent
+    public static void onSleep(PlayerSleepInBedEvent event) {
+        EntityPlayer player = event.getEntityPlayer();
+        NyxWorld nyx = NyxWorld.get(player.world);
+        if (nyx != null && nyx.currentEvent instanceof BloodMoon && !Config.bloodMoonSleeping)
+            event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
     }
 
     private static Entity spawnEntity(World world, double x, double y, double z, ResourceLocation name) {

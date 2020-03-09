@@ -4,10 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
-import de.ellpeck.nyx.lunarevents.FullMoon;
-import de.ellpeck.nyx.lunarevents.HarvestMoon;
-import de.ellpeck.nyx.lunarevents.LunarEvent;
-import de.ellpeck.nyx.lunarevents.StarShower;
+import de.ellpeck.nyx.lunarevents.*;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +39,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         this.world = world;
         this.lunarEvents.add(new HarvestMoon(this));
         this.lunarEvents.add(new StarShower(this));
+        this.lunarEvents.add(new BloodMoon(this));
         // this needs to stay at the end to prioritize random events
         this.lunarEvents.add(new FullMoon(this));
     }

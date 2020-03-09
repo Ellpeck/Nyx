@@ -27,6 +27,9 @@ public final class Config {
     public static double starShowerRarity;
     public static boolean fullMoon;
     public static double cometShardChance;
+    public static boolean bloodMoon;
+    public static double bloodMoonChance;
+    public static boolean bloodMoonSleeping;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -55,8 +58,12 @@ public final class Config {
         fallingStars = instance.get("fallingStars", "fallingStars", true, "If falling stars should be enabled").getBoolean();
         fallingStarRarity = instance.get("fallingStars", "fallingStarRarity", 0.01F, "The chance in percent (1 = 100%) for a falling star to appear at night for each player each second", 0, 1).getDouble();
         starShowers = instance.get("fallingStars", "starShowers", true, "If star showers should be enabled").getBoolean();
-        starShowerRarity = instance.get("fallingStars", "starShowerRarity", 0.05, "The chance in percent (1 = 100%) of a star shower occuring on any given night").getDouble();
-        cometShardChance = instance.get("fallingStars", "cometShardChance", 0.05, "The chance in percent (1 = 100%) for a falling star to spawn a comet shard instead of a fallen star item").getDouble();
+        starShowerRarity = instance.get("fallingStars", "starShowerRarity", 0.05, "The chance in percent (1 = 100%) of a star shower occuring on any given night", 0, 1).getDouble();
+        cometShardChance = instance.get("fallingStars", "cometShardChance", 0.05, "The chance in percent (1 = 100%) for a falling star to spawn a comet shard instead of a fallen star item", 0, 1).getDouble();
+
+        bloodMoon = instance.get("bloodMoon", "bloodMoon", true, "If the blood moon should be enabled").getBoolean();
+        bloodMoonChance = instance.get("bloodMoon", "bloodMoonChance", 0.05, "The chance in percent (1 = 100%) of the blood moon occuring on a full moon night", 0, 1).getDouble();
+        bloodMoonSleeping = instance.get("bloodMoon", "bloodMoonSleeping", false, "If sleeping is allowed during a blood moon").getBoolean();
 
         if (instance.hasChanged())
             instance.save();
