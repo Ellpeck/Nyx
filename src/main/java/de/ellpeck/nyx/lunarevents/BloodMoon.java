@@ -5,13 +5,11 @@ import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.IEntityLivingData;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -24,6 +22,7 @@ import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import java.util.Set;
 
@@ -186,6 +185,7 @@ public class BloodMoon extends LunarEvent {
                                                 }
 
                                                 // edit: only spawn allowed mobs
+                                                ResourceLocation name = EntityList.getKey(entityliving);
                                                 boolean listed = Config.mobDuplicationBlacklist.contains(name.toString());
                                                 if (Config.isMobDuplicationWhitelist != listed) {
                                                     // it looks like setting entry to null here selects a new random entity to spawn
