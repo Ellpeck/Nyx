@@ -88,16 +88,19 @@ public final class Events {
 
         // Falling stars
         if (!event.world.isRemote && Config.fallingStars && !event.world.isDaytime() && event.world.getTotalWorldTime() % 20 == 0) {
-            for (EntityPlayer player : event.world.playerEntities) {
-                float chanceMult = data.currentEvent instanceof StarShower ? 15 : 1;
-                if (event.world.rand.nextFloat() > Config.fallingStarRarity * chanceMult)
-                    continue;
-                BlockPos startPos = player.getPosition().add(event.world.rand.nextGaussian() * 20, 0, event.world.rand.nextGaussian() * 20);
-                startPos = event.world.getHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));
+            String dimension = event.world.provider.getDimensionType().getName();
+            if (Config.allowedDimensions.contains(dimension)) {
+                for (EntityPlayer player : event.world.playerEntities) {
+                    float chanceMult = data.currentEvent instanceof StarShower ? 15 : 1;
+                    if (event.world.rand.nextFloat() > Config.fallingStarRarity * chanceMult)
+                        continue;
+                    BlockPos startPos = player.getPosition().add(event.world.rand.nextGaussian() * 20, 0, event.world.rand.nextGaussian() * 20);
+                    startPos = event.world.getHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));
 
-                FallingStar star = new FallingStar(event.world);
-                star.setPosition(startPos.getX(), startPos.getY(), startPos.getZ());
-                event.world.spawnEntity(star);
+                    FallingStar star = new FallingStar(event.world);
+                    star.setPosition(startPos.getX(), startPos.getY(), startPos.getZ());
+                    event.world.spawnEntity(star);
+                }
             }
         }
     }
