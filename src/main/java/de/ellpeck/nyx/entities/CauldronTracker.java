@@ -2,6 +2,7 @@ package de.ellpeck.nyx.entities;
 
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.blocks.LunarWaterCauldron;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.lunarevents.FullMoon;
 import net.minecraft.block.Block;
@@ -60,18 +61,21 @@ public class CauldronTracker extends Entity {
 
         IBlockState state = this.world.getBlockState(this.trackingPos);
         Block block = state.getBlock();
-        if (!(block instanceof BlockCauldron)) {
+        if (!(block instanceof BlockCauldron) || block instanceof LunarWaterCauldron) {
             this.setDead();
             return;
         }
 
         int level = state.getValue(BlockCauldron.LEVEL);
-        if (!this.dataManager.get(IS_DONE)) {
-            if (level <= 0) {
+        if (level <= 0) {
+            if (this.timer > 0) {
+                this.dataManager.set(IS_DONE, false);
                 this.timer = 0;
-                return;
             }
+            return;
+        }
 
+        if (!this.dataManager.get(IS_DONE)) {
             NyxWorld nyx = NyxWorld.get(this.world);
             if (nyx == null || !(nyx.currentEvent instanceof FullMoon) || !this.world.canSeeSky(this.trackingPos)) {
                 this.timer = 0;
