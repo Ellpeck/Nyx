@@ -52,7 +52,15 @@ public class LunarWaterBottle extends Item {
     public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
         if (!worldIn.isRemote)
             applyLunarWater(entityLiving);
-        return new ItemStack(Items.GLASS_BOTTLE);
+        EntityPlayer player = entityLiving instanceof EntityPlayer ? (EntityPlayer) entityLiving : null;
+        if (player == null || !player.capabilities.isCreativeMode) {
+            stack.shrink(1);
+            if (stack.isEmpty())
+                return new ItemStack(Items.GLASS_BOTTLE);
+            if (player != null)
+                player.inventory.addItemStackToInventory(new ItemStack(Items.GLASS_BOTTLE));
+        }
+        return stack;
     }
 
     @Override
