@@ -50,7 +50,7 @@ public class FallingStar extends Entity {
                 this.setDead();
             } else {
                 if (this.ticksExisted % 40 == 0)
-                    this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarSound, SoundCategory.AMBIENT, 8, 1);
+                    this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarSound, SoundCategory.AMBIENT, 5, 1);
             }
         } else {
             for (int i = 0; i < 2; i++) {
