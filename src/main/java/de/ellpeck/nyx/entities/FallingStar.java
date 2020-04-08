@@ -47,7 +47,6 @@ public class FallingStar extends Entity {
                 EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(result));
                 item.getEntityData().setBoolean(Nyx.ID + ":fallen_star", true);
                 this.world.spawnEntity(item);
-                this.placeStarAir();
                 this.setDead();
             } else {
                 if (this.ticksExisted % 40 == 0)
@@ -62,26 +61,6 @@ public class FallingStar extends Entity {
             }
         }
         super.onEntityUpdate();
-    }
-
-    private void placeStarAir() {
-        BlockPos pos = this.getPosition();
-        if (this.world.getBlockState(pos).getBlock().isReplaceable(this.world, pos)) {
-            this.world.setBlockState(pos, Registry.starAir.getDefaultState());
-            return;
-        }
-
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos offset = pos.add(x, y, z);
-                    if (this.world.getBlockState(offset).getBlock().isReplaceable(this.world, offset)) {
-                        this.world.setBlockState(offset, Registry.starAir.getDefaultState());
-                        return;
-                    }
-                }
-            }
-        }
     }
 
     @Override

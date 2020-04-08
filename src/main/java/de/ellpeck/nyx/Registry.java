@@ -9,6 +9,7 @@ import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
+import de.ellpeck.nyx.items.FallenStar;
 import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -103,7 +104,7 @@ public final class Registry {
             reg.register(lunarWaterBottle = new LunarWaterBottle());
         reg.register(cometShard = initItem(new Item(), "comet_shard"));
         if (Config.fallingStars)
-            reg.register(fallenStar = initItem(new Item(), "fallen_star"));
+            reg.register(fallenStar = initItem(new FallenStar(), "fallen_star"));
     }
 
     @SubscribeEvent
