@@ -13,9 +13,9 @@ public class FallenStar extends Item {
     public boolean onEntityItemUpdate(EntityItem entityItem) {
         if (entityItem.world.isRemote) {
             if (entityItem.world.rand.nextFloat() >= 0.7F) {
-                double mX = entityItem.world.rand.nextGaussian() * 0.1;
-                double mY = entityItem.world.rand.nextFloat() * 0.2;
-                double mZ = entityItem.world.rand.nextGaussian() * 0.1;
+                double mX = entityItem.world.rand.nextGaussian() * 0.05;
+                double mY = entityItem.world.rand.nextFloat() * 0.4;
+                double mZ = entityItem.world.rand.nextGaussian() * 0.05;
                 entityItem.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, true, entityItem.posX, entityItem.posY + 0.5F, entityItem.posZ, mX, mY, mZ);
             }
             return false;
