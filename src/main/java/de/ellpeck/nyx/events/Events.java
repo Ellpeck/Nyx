@@ -6,7 +6,7 @@ import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
-import de.ellpeck.nyx.entities.WolfAiFullMoon;
+import de.ellpeck.nyx.entities.WolfAiSpecialMoon;
 import de.ellpeck.nyx.lunarevents.BloodMoon;
 import de.ellpeck.nyx.lunarevents.FullMoon;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
@@ -66,10 +66,8 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 @EventBusSubscriber(modid = Nyx.ID)
@@ -130,7 +128,7 @@ public final class Events {
             PacketHandler.sendTo((EntityPlayerMP) entity, packet);
         } else if (entity instanceof EntityWolf) {
             EntityWolf wolf = (EntityWolf) entity;
-            wolf.targetTasks.addTask(3, new WolfAiFullMoon(wolf));
+            wolf.targetTasks.addTask(3, new WolfAiSpecialMoon(wolf));
         }
     }
 
