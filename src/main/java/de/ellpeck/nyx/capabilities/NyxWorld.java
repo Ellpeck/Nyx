@@ -28,11 +28,12 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public static float moonPhase;
 
     public final World world;
+    public final List<LunarEvent> lunarEvents = new ArrayList<>();
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
+    public LunarEvent forcedEvent;
 
-    private final List<LunarEvent> lunarEvents = new ArrayList<>();
     private boolean wasDaytime;
 
     public NyxWorld(World world) {
@@ -58,18 +59,22 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
             boolean isDirty = false;
 
             if (this.currentEvent == null) {
-                for (LunarEvent event : this.lunarEvents) {
-                    if (!event.shouldStart(this.wasDaytime))
-                        continue;
-
-                    this.currentEvent = event;
+                if (this.forcedEvent != null && this.forcedEvent.shouldStart(this.wasDaytime)) {
+                    this.currentEvent = this.forcedEvent;
+                    this.forcedEvent = null;
+                } else {
+                    for (LunarEvent event : this.lunarEvents) {
+                        if (event.shouldStart(this.wasDaytime)) {
+                            this.currentEvent = event;
+                            break;
+                        }
+                    }
+                }
+                if (this.currentEvent != null) {
                     isDirty = true;
-
-                    ITextComponent text = event.getStartMessage();
+                    ITextComponent text = this.currentEvent.getStartMessage();
                     for (EntityPlayer player : this.world.playerEntities)
                         player.sendMessage(text);
-
-                    break;
                 }
             }
 

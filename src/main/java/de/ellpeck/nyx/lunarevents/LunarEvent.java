@@ -76,6 +76,8 @@ public abstract class LunarEvent implements INBTSerializable<NBTTagCompound> {
         }
 
         public boolean canStart() {
+            if (LunarEvent.this.nyxWorld.forcedEvent == LunarEvent.this)
+                return true;
             if (this.startDays < this.config.get().startNight)
                 return false;
             if (this.graceDays < this.config.get().graceDays)
