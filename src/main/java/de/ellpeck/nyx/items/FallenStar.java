@@ -4,14 +4,27 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 
 public class FallenStar extends Item {
 
     @Override
     public boolean onEntityItemUpdate(EntityItem entityItem) {
-        if (entityItem.world.isRemote)
+        if (entityItem.world.isRemote) {
+            if (entityItem.world.rand.nextFloat() >= 0.7F) {
+                double mX = entityItem.world.rand.nextGaussian() * 0.1;
+                double mY = entityItem.world.rand.nextFloat() * 0.2;
+                double mZ = entityItem.world.rand.nextGaussian() * 0.1;
+                entityItem.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, true, entityItem.posX, entityItem.posY + 0.5F, entityItem.posZ, mX, mY, mZ);
+            }
             return false;
+        }
+
+        // This tag is set to true only by stars spawned by falling
+        if (!entityItem.getEntityData().getBoolean(Nyx.ID + ":fallen_star"))
+            return false;
+
         if (entityItem.world.isDaytime()) {
             entityItem.setDead();
             return true;
