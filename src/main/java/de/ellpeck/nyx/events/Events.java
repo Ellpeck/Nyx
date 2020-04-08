@@ -204,8 +204,8 @@ public final class Events {
                 if (i <= 2)
                     size += 2;
             } else if (nyx.currentEvent instanceof HarvestMoon) {
-                int i = slime.world.rand.nextInt(12);
-                if (i < 6)
+                int i = slime.world.rand.nextInt(15);
+                if (i < 8)
                     size += i * 2;
             }
             if (size != slime.getSlimeSize()) {
