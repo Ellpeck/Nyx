@@ -12,6 +12,11 @@ public class FallenStar extends Item {
     public boolean onEntityItemUpdate(EntityItem entityItem) {
         if (entityItem.world.isRemote)
             return false;
+        if (entityItem.world.isDaytime()) {
+            entityItem.setDead();
+            return true;
+        }
+
         String lastOnGround = Nyx.ID + ":last_on_ground";
         if (entityItem.onGround && !entityItem.getEntityData().getBoolean(lastOnGround)) {
             entityItem.getEntityData().setBoolean(lastOnGround, true);
