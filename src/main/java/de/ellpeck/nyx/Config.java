@@ -32,6 +32,7 @@ public final class Config {
     public static int bloodMoonSpawnRadius;
     public static boolean harvestMoonOnFull;
     public static boolean bloodMoonOnFull;
+    public static boolean moonEventTint;
     public static LunarEventConfig harvestMoon;
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
@@ -49,6 +50,7 @@ public final class Config {
         nightTicks = instance.get("general", "nightTicks", 10000, "The amount of ticks that an in-game night lasts for").getInt();
         mobDuplicationBlacklist = Sets.newHashSet(instance.get("general", "mobDuplicationBlacklist", new String[0], "The registry names of entities that should not be spawned during the full and blood moons. If isMobDuplicationWhitelist is true, this acts as a whitelist instead.").getStringList());
         isMobDuplicationWhitelist = instance.get("general", "isMobDuplicationWhitelist", false, "If the mobDuplicationBlacklist should act as a whitelist instead").getBoolean();
+        moonEventTint = instance.get("general", "moonEventTint", true, "If moon events should tint the sky").getBoolean();
 
         fullMoon = instance.get("fullMoon", "fullMoon", true, "If the vanilla full moon should be considered a proper lunar event").getBoolean();
         addPotionEffects = instance.get("fullMoon", "addPotionEffects", true, "If mobs spawned during a full moon should have random potion effects applied to them (similarly to spiders in the base game)").getBoolean();

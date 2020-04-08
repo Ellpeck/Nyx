@@ -104,6 +104,8 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onFogRender(EntityViewRenderEvent.FogColors event) {
+        if (!Config.moonEventTint)
+            return;
         NyxWorld world = NyxWorld.get(Minecraft.getMinecraft().world);
         if (world == null || world.currentSkyColor == 0)
             return;
