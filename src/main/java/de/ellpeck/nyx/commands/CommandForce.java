@@ -53,6 +53,6 @@ public class CommandForce extends CommandBase {
             return Collections.emptyList();
         List<String> ret = world.lunarEvents.stream().map(e -> e.name).collect(Collectors.toList());
         ret.add("clear");
-        return ret;
+        return getListOfStringsMatchingLastWord(args, ret);
     }
 }

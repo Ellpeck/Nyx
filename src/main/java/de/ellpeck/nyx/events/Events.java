@@ -133,18 +133,6 @@ public final class Events {
     }
 
     @SubscribeEvent
-    public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
-        World world = event.getWorld();
-        if (world.isRemote)
-            return;
-        NyxWorld nyx = NyxWorld.get(world);
-        if (nyx == null || !(nyx.currentEvent instanceof HarvestMoon))
-            return;
-        if (world.rand.nextDouble() <= Config.harvestMoonGrowthChance)
-            event.setResult(Event.Result.ALLOW);
-    }
-
-    @SubscribeEvent
     public static void onExpDrop(LivingExperienceDropEvent event) {
         if (Config.enchantments && Config.lunarEdgeXp) {
             EntityPlayer player = event.getAttackingPlayer();

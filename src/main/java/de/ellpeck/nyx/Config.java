@@ -17,7 +17,6 @@ public final class Config {
     public static int additionalMobsChance;
     public static boolean lunarEdgeXp;
     public static boolean disallowDayEnchanting;
-    public static double harvestMoonGrowthChance;
     public static double cometShardGuardianChance;
     public static boolean fallingStars;
     public static double fallingStarRarity;
@@ -33,6 +32,8 @@ public final class Config {
     public static boolean harvestMoonOnFull;
     public static boolean bloodMoonOnFull;
     public static boolean moonEventTint;
+    public static int harvestMoonGrowAmount;
+    public static int harvestMoonGrowInterval;
     public static LunarEventConfig harvestMoon;
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
@@ -61,8 +62,9 @@ public final class Config {
         disallowDayEnchanting = instance.get("enchantments", "disallowDayEnchanting", true, "If enchanting should be disallowed during the day").getBoolean();
 
         harvestMoon = new LunarEventConfig("harvestMoon", "harvestMoon", "Harvest Moon", 0.05);
-        harvestMoonGrowthChance = instance.get("harvestMoon", "harvestMoonGrowthChance", 0.8, "The chance in percent (1 = 100%) for any crop to get an extra growth tick each random tick during the harvest moon", 0, 1).getDouble();
         harvestMoonOnFull = instance.get("harvestMoon", "harvestMoonOnFull", true, "If the harvest moon should only occur on full moon nights").getBoolean();
+        harvestMoonGrowAmount = instance.get("harvestMoon", "harvestMoonGrowAmount", 15, "The amount of plants that should be grown per chunk during the harvest moon", 0, 100).getInt();
+        harvestMoonGrowInterval = instance.get("harvestMoon", "harvestMoonGrowInterval", 10, "The amount of ticks that should pass before plants are grown again during the harvest moon", 1, 100).getInt();
 
         starShowers = new LunarEventConfig("fallingStars", "starShowers", "Star Showers", 0.05);
         fallingStars = instance.get("fallingStars", "fallingStars", true, "If falling stars should be enabled").getBoolean();
