@@ -25,7 +25,7 @@ import java.util.Random;
 public class StarAir extends BlockContainer {
     public StarAir() {
         super(Material.AIR);
-        Registry.initBlock(this, "star_air");
+        Registry.initBlock(this, "star_air", null);
         this.setLightLevel(1);
         GameRegistry.registerTileEntity(Tile.class, this.getRegistryName());
     }

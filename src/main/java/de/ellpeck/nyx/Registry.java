@@ -1,21 +1,24 @@
 package de.ellpeck.nyx;
 
-import de.ellpeck.nyx.blocks.LunarWater;
-import de.ellpeck.nyx.blocks.LunarWaterCauldron;
-import de.ellpeck.nyx.blocks.LunarWaterFluid;
-import de.ellpeck.nyx.blocks.StarAir;
+import de.ellpeck.nyx.blocks.*;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.items.FallenStar;
+import de.ellpeck.nyx.items.ItemNyxSlab;
 import de.ellpeck.nyx.items.LunarWaterBottle;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -29,6 +32,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
@@ -36,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = Nyx.ID)
 public final class Registry {
@@ -58,6 +64,11 @@ public final class Registry {
     public static Block lunarWater;
     public static Block lunarWaterCauldron;
     public static Block starAir;
+    public static Block starBlock;
+    public static Block crackedStarBlock;
+    public static Block chiseledStarBlock;
+    public static Block starStairs;
+    public static Block starSlab;
 
     public static Fluid lunarWaterFluid;
 
@@ -93,18 +104,28 @@ public final class Registry {
                     lunarWaterCauldron = new LunarWaterCauldron()
             );
         }
-        if (Config.fallingStars)
-            reg.register(starAir = new StarAir());
+        if (Config.fallingStars) {
+            reg.registerAll(
+                    starAir = new StarAir(),
+                    starBlock = initBlock(new Block(Material.ROCK).setHardness(2), "star_block", ItemBlock::new),
+                    crackedStarBlock = initBlock(new Block(Material.ROCK).setHardness(2), "cracked_star_block", ItemBlock::new),
+                    chiseledStarBlock = initBlock(new Block(Material.ROCK).setHardness(2), "chiseled_star_block", ItemBlock::new),
+                    starStairs = initBlock(new NyxStairs(starBlock.getDefaultState()), "star_stairs", ItemBlock::new)
+            );
+            NyxSlab[] slabs = NyxSlab.makeSlab("star_slab", Material.ROCK, SoundType.STONE, 2);
+            reg.registerAll(slabs);
+            starSlab = slabs[0];
+        }
     }
 
     @SubscribeEvent
     public static void onItemRegistry(RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> reg = event.getRegistry();
         if (Config.lunarWater)
-            reg.register(lunarWaterBottle = new LunarWaterBottle());
-        reg.register(cometShard = initItem(new Item(), "comet_shard"));
+            lunarWaterBottle = new LunarWaterBottle();
+        cometShard = initItem(new Item(), "comet_shard");
         if (Config.fallingStars)
-            reg.register(fallenStar = initItem(new FallenStar(), "fallen_star"));
+            fallenStar = initItem(new FallenStar(), "fallen_star");
+        MOD_ITEMS.forEach(event.getRegistry()::register);
     }
 
     @SubscribeEvent
@@ -116,7 +137,7 @@ public final class Registry {
         );
     }
 
-    public static void init() {
+    public static void preInit() {
         if (Config.lunarWater)
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "cauldron_tracker"), CauldronTracker.class, Nyx.ID + ".cauldron_tracker", 0, Nyx.instance, 64, 20, false);
         if (Config.fallingStars)
@@ -137,6 +158,11 @@ public final class Registry {
 
     }
 
+    public static void init() {
+        if (Config.fallingStars)
+            GameRegistry.addSmelting(new ItemStack(starBlock), new ItemStack(crackedStarBlock), 0.1F);
+    }
+
     public static Item initItem(Item item, String name) {
         item.setRegistryName(new ResourceLocation(Nyx.ID, name));
         item.setTranslationKey(Nyx.ID + "." + item.getRegistryName().getPath());
@@ -145,9 +171,12 @@ public final class Registry {
         return item;
     }
 
-    public static Block initBlock(Block block, String name) {
+    public static Block initBlock(Block block, String name, Function<Block, ItemBlock> item) {
         block.setRegistryName(new ResourceLocation(Nyx.ID, name));
         block.setTranslationKey(Nyx.ID + "." + block.getRegistryName().getPath());
+        block.setCreativeTab(CREATIVE_TAB);
+        if (item != null)
+            initItem(item.apply(block), name);
         return block;
     }
 }

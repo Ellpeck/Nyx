@@ -25,7 +25,7 @@ import net.minecraftforge.fluids.FluidUtil;
 
 public class LunarWaterCauldron extends BlockCauldron {
     public LunarWaterCauldron() {
-        Registry.initBlock(this, "lunar_water_cauldron");
+        Registry.initBlock(this, "lunar_water_cauldron", null);
         this.setLightLevel(0.8F);
     }
 

@@ -14,6 +14,12 @@ info.nyx.blood_moon_sleeping=The thought of sleep makes you uncomfortable
 
 tile.nxy.lunar_water.name=Lunar Water
 tile.nyx.lunar_water_cauldron.name=Cauldron of Lunar Water
+tile.nyx.star_block.name=Star Block
+tile.nyx.chiseled_star_block.name=Chiseled Star Block
+tile.nyx.cracked_star_block.name=Cracked Star Block
+tile.nyx.star_stairs.name=Star Block Stairs
+tile.nyx.star_slab.name=Star Block Slab
+tile.nyx.star_slab_double.name=Star Block Double Slab
 
 fluid.nyx.lunar_water=Lunar Water
 

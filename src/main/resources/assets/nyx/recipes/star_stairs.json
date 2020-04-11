@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#  ",
+        "## ",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "nyx:star_block"
+        }
+    },
+    "result": {
+        "item": "nyx:star_stairs",
+        "count": 4
+    }
+}

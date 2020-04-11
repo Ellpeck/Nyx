@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "normal": {
+            "model": "nyx:star_block"
+        },
+        "all": {
+            "model": "nyx:star_block"
+        }
+    }
+}

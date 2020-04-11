@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "half=bottom": {
+            "model": "nyx:star_slab"
+        },
+        "half=top": {
+            "model": "nyx:star_slab_top"
+        }
+    }
+}
