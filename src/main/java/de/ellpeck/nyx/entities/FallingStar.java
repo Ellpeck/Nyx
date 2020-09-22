@@ -37,6 +37,12 @@ public class FallingStar extends Entity {
 
     @Override
     public void onEntityUpdate() {
+        // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
+        if (!this.world.isAreaLoaded(this.getPosition(), 33, false)) {
+            this.setDead();
+            return;
+        }
+
         if (!this.world.isRemote) {
             this.move(MoverType.SELF, this.trajectoryX, this.trajectoryY, this.trajectoryZ);
 
