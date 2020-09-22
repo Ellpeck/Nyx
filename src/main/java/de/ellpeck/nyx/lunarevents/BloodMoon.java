@@ -186,8 +186,7 @@ public class BloodMoon extends LunarEvent {
 
                                                 // edit: only spawn allowed mobs
                                                 ResourceLocation name = EntityList.getKey(entityliving);
-                                                boolean listed = Config.mobDuplicationBlacklist.contains(name.toString());
-                                                if (Config.isMobDuplicationWhitelist != listed) {
+                                                if (name == null || Config.isMobDuplicationWhitelist != Config.mobDuplicationBlacklist.contains(name.toString())) {
                                                     // it looks like setting entry to null here selects a new random entity to spawn
                                                     entry = null;
                                                     continue;
