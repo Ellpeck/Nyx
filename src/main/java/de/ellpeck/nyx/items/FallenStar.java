@@ -2,6 +2,7 @@ package de.ellpeck.nyx.items;
 
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumParticleTypes;
@@ -25,7 +26,7 @@ public class FallenStar extends Item {
         if (!entityItem.getEntityData().getBoolean(Nyx.ID + ":fallen_star"))
             return false;
 
-        if (entityItem.world.isDaytime()) {
+        if (NyxWorld.isDaytime(entityItem.world)) {
             entityItem.setDead();
             return true;
         }

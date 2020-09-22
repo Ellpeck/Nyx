@@ -23,13 +23,13 @@ public class FullMoon extends LunarEvent {
     public boolean shouldStart(boolean lastDaytime) {
         if (!Config.fullMoon)
             return false;
-        if (!lastDaytime || this.world.isDaytime())
+        if (!lastDaytime || NyxWorld.isDaytime(this.world))
             return false;
         return this.world.getCurrentMoonPhaseFactor() >= 1;
     }
 
     @Override
     public boolean shouldStop(boolean lastDaytime) {
-        return this.world.isDaytime();
+        return NyxWorld.isDaytime(this.world);
     }
 }

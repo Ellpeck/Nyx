@@ -85,7 +85,7 @@ public final class Events {
         data.update();
 
         // Falling stars
-        if (!event.world.isRemote && Config.fallingStars && !event.world.isDaytime() && event.world.getTotalWorldTime() % 20 == 0) {
+        if (!event.world.isRemote && Config.fallingStars && !NyxWorld.isDaytime(event.world) && event.world.getTotalWorldTime() % 20 == 0) {
             String dimension = event.world.provider.getDimensionType().getName();
             if (Config.allowedDimensions.contains(dimension)) {
                 for (EntityPlayer player : event.world.playerEntities) {
@@ -107,7 +107,7 @@ public final class Events {
     public static void onLivingTick(LivingEvent.LivingUpdateEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
         // Delet monsters spawned by blood moon
-        if (Config.bloodMoonVanish && !entity.world.isRemote && entity.world.isDaytime() && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn")) {
+        if (Config.bloodMoonVanish && !entity.world.isRemote && NyxWorld.isDaytime(entity.world) && entity.getEntityData().getBoolean(Nyx.ID + ":blood_moon_spawn")) {
             ((WorldServer) entity.world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, entity.posX, entity.posY, entity.posZ, 10, 0.5, 1, 0.5, 0);
             entity.setDead();
         }

@@ -88,7 +88,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
                     PacketHandler.sendTo(player, new PacketNyxWorld(this));
             }
 
-            this.wasDaytime = this.world.isDaytime();
+            this.wasDaytime = isDaytime(this.world);
         } else {
             if (this.currentEvent != null && this.currentSkyColor != 0) {
                 if (this.eventSkyModifier < 1)
@@ -131,6 +131,13 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == Registry.worldCapability ? (T) this : null;
+    }
+
+    public static boolean isDaytime(World world) {
+        // https://minecraft.gamepedia.com/Bed
+        // at night (between 12541 and 23458 ticks, when stars appear in the sky)
+        long time = world.getWorldTime() % 24000;
+        return !(time >= 12541 && time < 23458);
     }
 
     public static NyxWorld get(World world) {

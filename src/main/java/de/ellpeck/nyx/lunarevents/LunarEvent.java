@@ -65,7 +65,7 @@ public abstract class LunarEvent implements INBTSerializable<NBTTagCompound> {
                 this.graceDays = 0;
             }
 
-            if (!lastDaytime && LunarEvent.this.world.isDaytime()) {
+            if (!lastDaytime && NyxWorld.isDaytime(LunarEvent.this.world)) {
                 this.daysSinceLast++;
                 if (this.startDays < this.config.get().startNight)
                     this.startDays++;

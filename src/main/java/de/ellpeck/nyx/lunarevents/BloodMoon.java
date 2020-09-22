@@ -47,14 +47,14 @@ public class BloodMoon extends LunarEvent {
     public boolean shouldStart(boolean lastDaytime) {
         if (Config.bloodMoonOnFull && this.world.getCurrentMoonPhaseFactor() < 1)
             return false;
-        if (!lastDaytime || this.world.isDaytime())
+        if (!lastDaytime || NyxWorld.isDaytime(this.world))
             return false;
         return this.config.canStart();
     }
 
     @Override
     public boolean shouldStop(boolean lastDaytime) {
-        return this.world.isDaytime();
+        return NyxWorld.isDaytime(this.world);
     }
 
     @Override
