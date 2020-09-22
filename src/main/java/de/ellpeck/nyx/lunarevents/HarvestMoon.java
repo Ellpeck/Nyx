@@ -74,9 +74,12 @@ public class HarvestMoon extends LunarEvent {
                 Block block = state.getBlock();
                 if (!(block instanceof IGrowable) || block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant)
                     continue;
-                IGrowable growable = (IGrowable) block;
-                if (growable.canGrow(this.world, pos, state, false))
-                    growable.grow(this.world, this.world.rand, pos, state);
+                try {
+                    IGrowable growable = (IGrowable) block;
+                    if (growable.canGrow(this.world, pos, state, false))
+                        growable.grow(this.world, this.world.rand, pos, state);
+                } catch (Exception ignored) {
+                }
             }
         }
     }
