@@ -79,7 +79,7 @@ public class CauldronTracker extends Entity {
 
         if (!this.dataManager.get(IS_DONE)) {
             NyxWorld nyx = NyxWorld.get(this.world);
-            if (nyx == null || !this.world.canSeeSky(this.trackingPos)) {
+            if (nyx == null || !this.world.canSeeSky(this.trackingPos) || NyxWorld.isDaytime(this.world)) {
                 this.timer = 0;
                 return;
             }
