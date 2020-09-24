@@ -5,9 +5,7 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.NyxEnchantment;
-import de.ellpeck.nyx.entities.CauldronTracker;
-import de.ellpeck.nyx.entities.EmptyRenderer;
-import de.ellpeck.nyx.entities.FallingStar;
+import de.ellpeck.nyx.entities.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -122,6 +120,7 @@ public final class ClientEvents {
         }
         if (Config.fallingStars)
             RenderingRegistry.registerEntityRenderingHandler(FallingStar.class, EmptyRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(FallingMeteor.class, MeteorRenderer::new);
 
         for (Item item : Registry.MOD_ITEMS)
             ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));

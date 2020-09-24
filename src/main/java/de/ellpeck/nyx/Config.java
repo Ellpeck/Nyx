@@ -1,7 +1,11 @@
 package de.ellpeck.nyx;
 
 import com.google.common.collect.Sets;
+import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.lunarevents.LunarEvent;
+import de.ellpeck.nyx.lunarevents.StarShower;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -36,6 +40,14 @@ public final class Config {
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
     public static int[] lunarWaterTicks;
+    public static double meteorChance;
+    public static double meteorChanceNight;
+    public static String meteorGateDimension;
+    public static double meteorChanceAfterGate;
+    public static double meteorChanceAfterGateNight;
+    public static double meteorChanceStarShower;
+    public static double meteorChanceEnd;
+    public static int meteorSpawnRadius;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -76,8 +88,31 @@ public final class Config {
         bloodMoonSpawnRadius = instance.get("bloodMoon", "bloodMoonSpawnRadius", 20, "The closest distance that mobs can spawn away from a player during the blood moon. Vanilla value is 24.").getInt();
         bloodMoonOnFull = instance.get("bloodMoon", "bloodMoonOnFull", true, "If the blood moon should only occur on full moon nights").getBoolean();
 
+        meteorChance = instance.get("meteors", "meteorChance", 0.00014, "The chance of a meteor spawning every second, during the day").getDouble();
+        meteorChanceNight = instance.get("meteors", "meteorChanceNight", 0.0024, "The chance of a meteor spawning every second, during nighttime").getDouble();
+        meteorGateDimension = instance.get("meteors", "meteorGateDimension", "the_nether", "The dimension that needs to be entered to increase the spawning of meteors").getString();
+        meteorChanceAfterGate = instance.get("meteors", "meteorChanceAfterGate", 0.0002, "The chance of a meteor spawning every second, during the day, after the gate dimension has been entered once").getDouble();
+        meteorChanceAfterGateNight = instance.get("meteors", "meteorChanceAfterGateNight", 0.003, "The chance of a meteor spawning every second, during the day, after the gate dimension has been entered once").getDouble();
+        meteorChanceStarShower = instance.get("meteors", "meteorChanceStarShower", 0.0075, "The chance of a meteor spawning every second, during a star shower").getDouble();
+        meteorChanceEnd = instance.get("meteors", "meteorChanceEnd", 0.003, "The chance of a meteor spawning every second, in the end dimension").getDouble();
+        meteorSpawnRadius = instance.get("meteors", "meteorSpawnRadius", 1000, "The amount of blocks a meteor can spawn away from the nearest player").getInt();
+
         if (instance.hasChanged())
             instance.save();
+    }
+
+    public static double getMeteorChance(World world, NyxWorld data) {
+        // TODO nether gate to change the chance
+        if (world.provider.getDimensionType() == DimensionType.THE_END) {
+            return Config.meteorChanceEnd;
+        } else if (!NyxWorld.isDaytime(world)) {
+            if (data.currentEvent instanceof StarShower) {
+                return Config.meteorChanceStarShower;
+            } else {
+                return Config.meteorChanceNight;
+            }
+        }
+        return Config.meteorChance;
     }
 
     public static class LunarEventConfig {

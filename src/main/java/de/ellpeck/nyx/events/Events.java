@@ -5,6 +5,7 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.entities.FallingMeteor;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.entities.WolfAiSpecialMoon;
 import de.ellpeck.nyx.lunarevents.BloodMoon;
@@ -42,11 +43,14 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -57,6 +61,7 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -69,6 +74,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = Nyx.ID)
 public final class Events {
@@ -101,6 +107,49 @@ public final class Events {
                 }
             }
         }
+
+        // Meteors
+        meteors:
+        if (!event.world.isRemote && event.world.getTotalWorldTime() % 20 == 0) {
+            double chance = Config.getMeteorChance(event.world, data);
+            if (!(event.world.rand.nextFloat() <= chance))
+                break meteors;
+            if (event.world.playerEntities.size() <= 0)
+                break meteors;
+            EntityPlayer selectedPlayer = event.world.playerEntities.get(event.world.rand.nextInt(event.world.playerEntities.size()));
+            if (selectedPlayer == null)
+                break meteors;
+            double spawnX = selectedPlayer.posX + MathHelper.nextDouble(event.world.rand, -Config.meteorSpawnRadius, Config.meteorSpawnRadius);
+            double spawnZ = selectedPlayer.posZ + MathHelper.nextDouble(event.world.rand, -Config.meteorSpawnRadius, Config.meteorSpawnRadius);
+            BlockPos spawnPos = new BlockPos(spawnX, 0, spawnZ);
+            if (!event.world.isBlockLoaded(spawnPos, false)) {
+                // add meteor information to cache
+                data.cachedMeteorPositions.add(spawnPos);
+            } else {
+                // spawn meteor entity
+                FallingMeteor.spawn(data.world, spawnPos);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onChunkLoad(ChunkEvent.Load event) {
+        World world = event.getWorld();
+        if (world.isRemote)
+            return;
+        NyxWorld data = NyxWorld.get(world);
+        if (data == null)
+            return;
+        Chunk chunk = event.getChunk();
+        ChunkPos cp = chunk.getPos();
+
+        // spawn meteors from the cache
+        List<BlockPos> meteors = data.cachedMeteorPositions.stream()
+                .filter(p -> p.getX() >= cp.getXStart() && p.getZ() >= cp.getZStart() && p.getX() <= cp.getXEnd() && p.getZ() <= cp.getZEnd())
+                .collect(Collectors.toList());
+        for (BlockPos pos : meteors)
+            FallingMeteor.spawn(data.world, pos);
+        data.cachedMeteorPositions.removeAll(meteors);
     }
 
     @SubscribeEvent

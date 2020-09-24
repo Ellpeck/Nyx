@@ -18,9 +18,9 @@ import net.minecraft.world.World;
 
 public class FallingStar extends Entity {
 
-    private float trajectoryX;
-    private float trajectoryY;
-    private float trajectoryZ;
+    protected float trajectoryX;
+    protected float trajectoryY;
+    protected float trajectoryZ;
 
     public FallingStar(World worldIn) {
         super(worldIn);
@@ -37,15 +37,19 @@ public class FallingStar extends Entity {
 
     @Override
     public void onEntityUpdate() {
-        // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
-        if (!this.world.isAreaLoaded(this.getPosition(), 33, false)) {
+        this.customUpdate();
+        if (!this.world.isRemote)
+            this.move(MoverType.SELF, this.trajectoryX, this.trajectoryY, this.trajectoryZ);
+        super.onEntityUpdate();
+    }
+
+    protected void customUpdate() {
+        if (this.isEnteringUnloaded()) {
             this.setDead();
             return;
         }
 
         if (!this.world.isRemote) {
-            this.move(MoverType.SELF, this.trajectoryX, this.trajectoryY, this.trajectoryZ);
-
             if (this.collided) {
                 this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarImpactSound, SoundCategory.AMBIENT, 10, 1);
 
@@ -65,7 +69,11 @@ public class FallingStar extends Entity {
                 this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, true, this.posX, this.posY, this.posZ, mX, mY, mZ);
             }
         }
-        super.onEntityUpdate();
+    }
+
+    protected boolean isEnteringUnloaded() {
+        // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
+        return !this.world.isAreaLoaded(this.getPosition(), 33, false);
     }
 
     @Override

@@ -9,19 +9,21 @@ import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
 
@@ -29,6 +31,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
     public final World world;
     public final List<LunarEvent> lunarEvents = new ArrayList<>();
+    public final Set<BlockPos> cachedMeteorPositions = new HashSet<>();
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
@@ -108,6 +111,10 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         compound.setBoolean("was_daytime", this.wasDaytime);
         for (LunarEvent event : this.lunarEvents)
             compound.setTag(event.name, event.serializeNBT());
+        NBTTagList list = new NBTTagList();
+        for (BlockPos pos : this.cachedMeteorPositions)
+            list.appendTag(new NBTTagLong(pos.toLong()));
+        compound.setTag("cached_meteors", list);
         return compound;
     }
 
@@ -120,6 +127,10 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         this.wasDaytime = compound.getBoolean("was_daytime");
         for (LunarEvent event : this.lunarEvents)
             event.deserializeNBT(compound.getCompoundTag(event.name));
+        this.cachedMeteorPositions.clear();
+        NBTTagList list = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
+        for (int i = 0; i < list.tagCount(); i++)
+            this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
     }
 
     @Override

@@ -5,6 +5,7 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.enchantments.LunarEdge;
 import de.ellpeck.nyx.enchantments.LunarShield;
 import de.ellpeck.nyx.entities.CauldronTracker;
+import de.ellpeck.nyx.entities.FallingMeteor;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.items.FallenStar;
 import de.ellpeck.nyx.items.ItemNyxSlab;
@@ -142,6 +143,7 @@ public final class Registry {
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "cauldron_tracker"), CauldronTracker.class, Nyx.ID + ".cauldron_tracker", 0, Nyx.instance, 64, 20, false);
         if (Config.fallingStars)
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_star"), FallingStar.class, Nyx.ID + ".falling_star", 1, Nyx.instance, 128, 1, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_meteor"), FallingMeteor.class, Nyx.ID + ".falling_meteor", 2, Nyx.instance, 256, 1, true);
 
         CapabilityManager.INSTANCE.register(NyxWorld.class, new Capability.IStorage<NyxWorld>() {
             @Nullable
