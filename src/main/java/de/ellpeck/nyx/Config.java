@@ -21,7 +21,6 @@ public final class Config {
     public static boolean fallingStars;
     public static double fallingStarRarity;
     public static boolean fullMoon;
-    public static double cometShardChance;
     public static boolean bloodMoonSleeping;
     public static int bloodMoonSpawnMultiplier;
     public static Set<String> mobDuplicationBlacklist;
@@ -69,7 +68,6 @@ public final class Config {
         starShowers = new LunarEventConfig("fallingStars", "starShowers", "Star Showers", 0.05);
         fallingStars = instance.get("fallingStars", "fallingStars", true, "If falling stars should be enabled").getBoolean();
         fallingStarRarity = instance.get("fallingStars", "fallingStarRarity", 0.01F, "The chance in percent (1 = 100%) for a falling star to appear at night for each player each second", 0, 1).getDouble();
-        cometShardChance = instance.get("fallingStars", "cometShardChance", 0.05, "The chance in percent (1 = 100%) for a falling star to spawn a comet shard instead of a fallen star item", 0, 1).getDouble();
 
         bloodMoon = new LunarEventConfig("bloodMoon", "bloodMoon", "Blood Moon", 0.05);
         bloodMoonSleeping = instance.get("bloodMoon", "bloodMoonSleeping", false, "If sleeping is allowed during a blood moon").getBoolean();

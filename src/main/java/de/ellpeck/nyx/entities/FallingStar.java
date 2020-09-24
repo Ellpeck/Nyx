@@ -49,8 +49,7 @@ public class FallingStar extends Entity {
             if (this.collided) {
                 this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingStarImpactSound, SoundCategory.AMBIENT, 10, 1);
 
-                Item result = this.world.rand.nextDouble() <= Config.cometShardChance ? Registry.cometShard : Registry.fallenStar;
-                EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(result));
+                EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, new ItemStack(Registry.fallenStar));
                 item.getEntityData().setBoolean(Nyx.ID + ":fallen_star", true);
                 this.world.spawnEntity(item);
                 this.setDead();
