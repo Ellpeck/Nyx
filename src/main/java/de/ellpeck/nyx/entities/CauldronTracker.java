@@ -4,7 +4,9 @@ import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.blocks.LunarWaterCauldron;
 import de.ellpeck.nyx.capabilities.NyxWorld;
+import de.ellpeck.nyx.lunarevents.BloodMoon;
 import de.ellpeck.nyx.lunarevents.FullMoon;
+import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
@@ -77,14 +79,22 @@ public class CauldronTracker extends Entity {
 
         if (!this.dataManager.get(IS_DONE)) {
             NyxWorld nyx = NyxWorld.get(this.world);
-            if (nyx == null || !(nyx.currentEvent instanceof FullMoon) || !this.world.canSeeSky(this.trackingPos)) {
+            if (nyx == null || !this.world.canSeeSky(this.trackingPos)) {
                 this.timer = 0;
                 return;
             }
-
-            this.timer++;
-            if (this.timer >= Config.nightTicks)
-                this.dataManager.set(IS_DONE, true);
+            int phase = this.world.provider.getMoonPhase(this.world.getWorldTime());
+            if (nyx.currentEvent instanceof HarvestMoon) {
+                phase = 8;
+            } else if (nyx.currentEvent instanceof BloodMoon) {
+                phase = 9;
+            }
+            int ticksRequired = Config.lunarWaterTicks[phase];
+            if (ticksRequired >= 0) {
+                this.timer++;
+                if (this.timer >= ticksRequired)
+                    this.dataManager.set(IS_DONE, true);
+            }
         } else {
             List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.trackingPos));
             for (EntityItem item : items) {

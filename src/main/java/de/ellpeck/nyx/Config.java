@@ -20,7 +20,6 @@ public final class Config {
     public static double cometShardGuardianChance;
     public static boolean fallingStars;
     public static double fallingStarRarity;
-    public static int nightTicks;
     public static boolean fullMoon;
     public static double cometShardChance;
     public static boolean bloodMoonSleeping;
@@ -37,6 +36,7 @@ public final class Config {
     public static LunarEventConfig harvestMoon;
     public static LunarEventConfig starShowers;
     public static LunarEventConfig bloodMoon;
+    public static int[] lunarWaterTicks;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -48,10 +48,10 @@ public final class Config {
         allowedDimensions = Sets.newHashSet(instance.get("general", "allowedDimensions", new String[]{"overworld"}, "Names of the dimensions that lunar events should occur in").getStringList());
         lunarWater = instance.get("general", "lunarWater", true, "If lunar water should be enabled").getBoolean();
         cometShardGuardianChance = instance.get("general", "cometShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a comet shard to be dropped from an elder guardian", 0, 1).getDouble();
-        nightTicks = instance.get("general", "nightTicks", 10000, "The amount of ticks that an in-game night lasts for").getInt();
         mobDuplicationBlacklist = Sets.newHashSet(instance.get("general", "mobDuplicationBlacklist", new String[0], "The registry names of entities that should not be spawned during the full and blood moons. If isMobDuplicationWhitelist is true, this acts as a whitelist instead.").getStringList());
         isMobDuplicationWhitelist = instance.get("general", "isMobDuplicationWhitelist", false, "If the mobDuplicationBlacklist should act as a whitelist instead").getBoolean();
         moonEventTint = instance.get("general", "moonEventTint", true, "If moon events should tint the sky").getBoolean();
+        lunarWaterTicks = instance.get("general", "lunarWaterTicks", new int[]{1200, -1, 4800, 4800, 3600, 3600, 2400, 2400, 600, -1}, "The amount of ticks that a cauldron of water must be exposed to the night sky to be ready to turn into lunar water, per moon phase. From first to last, the entries are: Full moon, new moon, waning crescent, waxing crescent, third quarter, first quarter, waning gibbous, waxing gibbous, harvest moon and blood moon. Set any entry to -1 to disable lunar water production for that phase.").getIntList();
 
         fullMoon = instance.get("fullMoon", "fullMoon", true, "If the vanilla full moon should be considered a proper lunar event").getBoolean();
         addPotionEffects = instance.get("fullMoon", "addPotionEffects", true, "If mobs spawned during a full moon should have random potion effects applied to them (similarly to spiders in the base game)").getBoolean();
