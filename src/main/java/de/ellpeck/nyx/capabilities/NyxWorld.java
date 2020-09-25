@@ -13,6 +13,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -20,10 +22,13 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.apache.commons.lang3.mutable.MutableInt;
+import scala.Int;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
 
@@ -32,6 +37,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public final World world;
     public final List<LunarEvent> lunarEvents = new ArrayList<>();
     public final Set<BlockPos> cachedMeteorPositions = new HashSet<>();
+    public final Map<ChunkPos, MutableInt> playersPresentTicks = new HashMap<>();
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
@@ -49,56 +55,83 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     }
 
     public void update() {
-        String dimension = this.world.provider.getDimensionType().getName();
-        if (!Config.allowedDimensions.contains(dimension))
-            return;
-
-        moonPhase = this.world.getCurrentMoonPhaseFactor();
-
-        for (LunarEvent event : this.lunarEvents)
-            event.update(this.wasDaytime);
-
+        // calculate which chunks have players close to them for meteor spawning
         if (!this.world.isRemote) {
-            boolean isDirty = false;
-
-            if (this.currentEvent == null) {
-                if (this.forcedEvent != null && this.forcedEvent.shouldStart(this.wasDaytime)) {
-                    this.currentEvent = this.forcedEvent;
-                    this.forcedEvent = null;
-                } else {
-                    for (LunarEvent event : this.lunarEvents) {
-                        if (event.shouldStart(this.wasDaytime)) {
-                            this.currentEvent = event;
-                            break;
+            int interval = 100;
+            if (Config.meteors && this.world.getTotalWorldTime() % interval == 0) {
+                Set<ChunkPos> remaining = new HashSet<>(this.playersPresentTicks.keySet());
+                for (EntityPlayer player : this.world.playerEntities) {
+                    for (int x = -Config.meteorDisallowRadius; x <= Config.meteorDisallowRadius; x++) {
+                        for (int z = -Config.meteorDisallowRadius; z <= Config.meteorDisallowRadius; z++) {
+                            ChunkPos pos = new ChunkPos(MathHelper.floor(player.posX / 16) + x, MathHelper.floor(player.posZ / 16) + z);
+                            MutableInt time = this.playersPresentTicks.computeIfAbsent(pos, p -> new MutableInt());
+                            time.add(interval);
+                            remaining.remove(pos);
                         }
                     }
                 }
-                if (this.currentEvent != null) {
-                    isDirty = true;
-                    ITextComponent text = this.currentEvent.getStartMessage();
-                    for (EntityPlayer player : this.world.playerEntities)
-                        player.sendMessage(text);
+                // all positions that weren't removed are player-free, so reduce them
+                if (remaining.size() > 0) {
+                    for (ChunkPos pos : remaining) {
+                        MutableInt time = this.playersPresentTicks.get(pos);
+                        time.subtract(interval);
+                        if (time.intValue() <= 0)
+                            this.playersPresentTicks.remove(pos);
+                    }
                 }
             }
+        }
 
-            if (this.currentEvent != null && this.currentEvent.shouldStop(this.wasDaytime)) {
-                this.currentEvent = null;
-                isDirty = true;
-            }
+        // moon event stuff
+        String dimension = this.world.provider.getDimensionType().getName();
+        if (Config.allowedDimensions.contains(dimension)) {
+            moonPhase = this.world.getCurrentMoonPhaseFactor();
 
-            if (isDirty) {
-                for (EntityPlayer player : this.world.playerEntities)
-                    PacketHandler.sendTo(player, new PacketNyxWorld(this));
-            }
+            for (LunarEvent event : this.lunarEvents)
+                event.update(this.wasDaytime);
 
-            this.wasDaytime = isDaytime(this.world);
-        } else {
-            if (this.currentEvent != null && this.currentSkyColor != 0) {
-                if (this.eventSkyModifier < 1)
-                    this.eventSkyModifier += 0.01F;
+            if (!this.world.isRemote) {
+                boolean isDirty = false;
+
+                if (this.currentEvent == null) {
+                    if (this.forcedEvent != null && this.forcedEvent.shouldStart(this.wasDaytime)) {
+                        this.currentEvent = this.forcedEvent;
+                        this.forcedEvent = null;
+                    } else {
+                        for (LunarEvent event : this.lunarEvents) {
+                            if (event.shouldStart(this.wasDaytime)) {
+                                this.currentEvent = event;
+                                break;
+                            }
+                        }
+                    }
+                    if (this.currentEvent != null) {
+                        isDirty = true;
+                        ITextComponent text = this.currentEvent.getStartMessage();
+                        for (EntityPlayer player : this.world.playerEntities)
+                            player.sendMessage(text);
+                    }
+                }
+
+                if (this.currentEvent != null && this.currentEvent.shouldStop(this.wasDaytime)) {
+                    this.currentEvent = null;
+                    isDirty = true;
+                }
+
+                if (isDirty) {
+                    for (EntityPlayer player : this.world.playerEntities)
+                        PacketHandler.sendTo(player, new PacketNyxWorld(this));
+                }
+
+                this.wasDaytime = isDaytime(this.world);
             } else {
-                if (this.eventSkyModifier > 0)
-                    this.eventSkyModifier -= 0.01F;
+                if (this.currentEvent != null && this.currentSkyColor != 0) {
+                    if (this.eventSkyModifier < 1)
+                        this.eventSkyModifier += 0.01F;
+                } else {
+                    if (this.eventSkyModifier > 0)
+                        this.eventSkyModifier -= 0.01F;
+                }
             }
         }
     }
@@ -111,10 +144,19 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         compound.setBoolean("was_daytime", this.wasDaytime);
         for (LunarEvent event : this.lunarEvents)
             compound.setTag(event.name, event.serializeNBT());
-        NBTTagList list = new NBTTagList();
+        NBTTagList meteors = new NBTTagList();
         for (BlockPos pos : this.cachedMeteorPositions)
-            list.appendTag(new NBTTagLong(pos.toLong()));
-        compound.setTag("cached_meteors", list);
+            meteors.appendTag(new NBTTagLong(pos.toLong()));
+        compound.setTag("cached_meteors", meteors);
+        NBTTagList ticks = new NBTTagList();
+        for (Map.Entry<ChunkPos, MutableInt> e : this.playersPresentTicks.entrySet()) {
+            NBTTagCompound comp = new NBTTagCompound();
+            comp.setInteger("x", e.getKey().x);
+            comp.setInteger("z", e.getKey().z);
+            comp.setInteger("ticks", e.getValue().intValue());
+            ticks.appendTag(comp);
+        }
+        compound.setTag("players_present_ticks", ticks);
         return compound;
     }
 
@@ -128,9 +170,15 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         for (LunarEvent event : this.lunarEvents)
             event.deserializeNBT(compound.getCompoundTag(event.name));
         this.cachedMeteorPositions.clear();
-        NBTTagList list = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
-        for (int i = 0; i < list.tagCount(); i++)
-            this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
+        NBTTagList meteors = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
+        for (int i = 0; i < meteors.tagCount(); i++)
+            this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) meteors.get(i)).getLong()));
+        this.playersPresentTicks.clear();
+        NBTTagList ticks = compound.getTagList("players_present_ticks", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < ticks.tagCount(); i++) {
+            NBTTagCompound comp = ticks.getCompoundTagAt(i);
+            this.playersPresentTicks.put(new ChunkPos(comp.getInteger("x"), comp.getInteger("z")), new MutableInt(comp.getInteger("ticks")));
+        }
     }
 
     @Override

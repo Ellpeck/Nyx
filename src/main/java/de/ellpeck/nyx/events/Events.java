@@ -70,6 +70,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -111,9 +112,6 @@ public final class Events {
         // Meteors
         meteors:
         if (!event.world.isRemote && Config.meteors && event.world.getTotalWorldTime() % 20 == 0) {
-            double chance = Config.getMeteorChance(event.world, data);
-            if (!(event.world.rand.nextFloat() <= chance))
-                break meteors;
             if (event.world.playerEntities.size() <= 0)
                 break meteors;
             EntityPlayer selectedPlayer = event.world.playerEntities.get(event.world.rand.nextInt(event.world.playerEntities.size()));
@@ -122,6 +120,12 @@ public final class Events {
             double spawnX = selectedPlayer.posX + MathHelper.nextDouble(event.world.rand, -Config.meteorSpawnRadius, Config.meteorSpawnRadius);
             double spawnZ = selectedPlayer.posZ + MathHelper.nextDouble(event.world.rand, -Config.meteorSpawnRadius, Config.meteorSpawnRadius);
             BlockPos spawnPos = new BlockPos(spawnX, 0, spawnZ);
+            double chance = Config.getMeteorChance(event.world, data);
+            MutableInt ticksInArea = data.playersPresentTicks.get(new ChunkPos(spawnPos));
+            if (ticksInArea != null && ticksInArea.intValue() >= Config.meteorDisallowTime)
+                chance /= Math.pow(2, ticksInArea.intValue() / (double) Config.meteorDisallowTime);
+            if (!(event.world.rand.nextFloat() <= chance))
+                break meteors;
             if (!event.world.isBlockLoaded(spawnPos, false)) {
                 // add meteor information to cache
                 data.cachedMeteorPositions.add(spawnPos);

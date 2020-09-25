@@ -49,6 +49,8 @@ public final class Config {
     public static double meteorChanceEnd;
     public static int meteorSpawnRadius;
     public static boolean meteors;
+    public static int meteorDisallowRadius;
+    public static int meteorDisallowTime;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -98,6 +100,8 @@ public final class Config {
         meteorChanceStarShower = instance.get("meteors", "meteorChanceStarShower", 0.0075, "The chance of a meteor spawning every second, during a star shower").getDouble();
         meteorChanceEnd = instance.get("meteors", "meteorChanceEnd", 0.003, "The chance of a meteor spawning every second, in the end dimension").getDouble();
         meteorSpawnRadius = instance.get("meteors", "meteorSpawnRadius", 1000, "The amount of blocks a meteor can spawn away from the nearest player").getInt();
+        meteorDisallowRadius = instance.get("meteors", "meteorDisallowRadius", 16, "The radius in chunks that should be marked as invalid for meteor spawning around each player").getInt();
+        meteorDisallowTime = instance.get("meteors", "meteorDisallowTime", 12000, "The amount of ticks that need to pass for each player until the chance of a meteor spawning in the area is halved (and then halved again, and so on)").getInt();
 
         if (instance.hasChanged())
             instance.save();
