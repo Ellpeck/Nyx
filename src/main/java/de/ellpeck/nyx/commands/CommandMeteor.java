@@ -38,7 +38,7 @@ public class CommandMeteor extends CommandBase {
         BlockPos pos = new BlockPos(x, 0, z);
         FallingMeteor meteor = FallingMeteor.spawn(sender.getEntityWorld(), pos);
         if (size != null)
-            meteor.size = size;
+            meteor.getDataManager().set(FallingMeteor.SIZE, size);
         pos = meteor.getPosition();
         notifyCommandListener(sender, this, "command.nyx.meteor.success", pos.getX(), pos.getY(), pos.getZ());
     }

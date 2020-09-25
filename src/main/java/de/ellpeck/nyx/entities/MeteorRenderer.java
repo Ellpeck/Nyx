@@ -31,7 +31,7 @@ public class MeteorRenderer extends Render<FallingMeteor> {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         GlStateManager.disableLighting();
-        float size = entity.size / 2F;
+        float size = entity.getDataManager().get(FallingMeteor.SIZE) / 2F;
         GlStateManager.scale(size, size, size);
         GlStateManager.translate(-1, -1, -1);
         this.bindTexture(RES);
