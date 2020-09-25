@@ -8,6 +8,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +21,13 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 public class FallingMeteor extends FallingStar {
+
+    public int size;
+
     public FallingMeteor(World worldIn) {
         super(worldIn);
+        this.size = worldIn.rand.nextInt(3) + 1;
+
         // meteor should be faster than falling star
         this.trajectoryX *= 2;
         this.trajectoryY *= 2;
@@ -32,9 +38,7 @@ public class FallingMeteor extends FallingStar {
     protected void customUpdate() {
         if (!this.world.isRemote) {
             if (this.collided) {
-                // TODO dynamic size
-                int size = 1;
-                Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, size * 4, true);
+                Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.size * 4, true);
                 for (BlockPos affected : exp.getAffectedBlockPositions()) {
                     if (!this.world.getBlockState(affected).getBlock().isReplaceable(this.world, affected) || !this.world.getBlockState(affected.down()).isFullBlock())
                         continue;
@@ -54,6 +58,18 @@ public class FallingMeteor extends FallingStar {
         } else {
             // TODO particles
         }
+    }
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound compound) {
+        super.writeEntityToNBT(compound);
+        compound.setInteger("size", this.size);
+    }
+
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
+        this.size = compound.getInteger("size");
     }
 
     public static void spawn(World world, BlockPos pos) {
