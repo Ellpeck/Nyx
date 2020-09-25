@@ -76,10 +76,11 @@ public class FallingMeteor extends FallingStar {
         this.size = compound.getInteger("size");
     }
 
-    public static void spawn(World world, BlockPos pos) {
+    public static FallingMeteor spawn(World world, BlockPos pos) {
         pos = world.getHeight(pos).up(MathHelper.getInt(world.rand, 64, 96));
         FallingMeteor meteor = new FallingMeteor(world);
         meteor.setPosition(pos.getX(), pos.getY(), pos.getZ());
         world.spawnEntity(meteor);
+        return meteor;
     }
 }

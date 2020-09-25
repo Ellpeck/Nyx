@@ -43,9 +43,7 @@ public class CommandForce extends CommandBase {
     }
 
     @Override
-    public List<String> getTabCompletions(MinecraftServer
-                                                  server, ICommandSender sender, String[] args, @Nullable BlockPos
-                                                  targetPos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length != 1)
             return Collections.emptyList();
         NyxWorld world = NyxWorld.get(sender.getEntityWorld());
