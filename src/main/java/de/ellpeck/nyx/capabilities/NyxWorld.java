@@ -138,30 +138,40 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
 
     @Override
     public NBTTagCompound serializeNBT() {
+        return this.serializeNBT(false);
+    }
+
+    public NBTTagCompound serializeNBT(boolean client) {
         NBTTagCompound compound = new NBTTagCompound();
         if (this.currentEvent != null)
             compound.setString("event", this.currentEvent.name);
         compound.setBoolean("was_daytime", this.wasDaytime);
         for (LunarEvent event : this.lunarEvents)
             compound.setTag(event.name, event.serializeNBT());
-        NBTTagList meteors = new NBTTagList();
-        for (BlockPos pos : this.cachedMeteorPositions)
-            meteors.appendTag(new NBTTagLong(pos.toLong()));
-        compound.setTag("cached_meteors", meteors);
-        NBTTagList ticks = new NBTTagList();
-        for (Map.Entry<ChunkPos, MutableInt> e : this.playersPresentTicks.entrySet()) {
-            NBTTagCompound comp = new NBTTagCompound();
-            comp.setInteger("x", e.getKey().x);
-            comp.setInteger("z", e.getKey().z);
-            comp.setInteger("ticks", e.getValue().intValue());
-            ticks.appendTag(comp);
+        if (!client) {
+            NBTTagList meteors = new NBTTagList();
+            for (BlockPos pos : this.cachedMeteorPositions)
+                meteors.appendTag(new NBTTagLong(pos.toLong()));
+            compound.setTag("cached_meteors", meteors);
+            NBTTagList ticks = new NBTTagList();
+            for (Map.Entry<ChunkPos, MutableInt> e : this.playersPresentTicks.entrySet()) {
+                NBTTagCompound comp = new NBTTagCompound();
+                comp.setInteger("x", e.getKey().x);
+                comp.setInteger("z", e.getKey().z);
+                comp.setInteger("ticks", e.getValue().intValue());
+                ticks.appendTag(comp);
+            }
+            compound.setTag("players_present_ticks", ticks);
         }
-        compound.setTag("players_present_ticks", ticks);
         return compound;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound compound) {
+        this.deserializeNBT(compound, false);
+    }
+
+    public void deserializeNBT(NBTTagCompound compound, boolean client) {
         String name = compound.getString("event");
         this.currentEvent = this.lunarEvents.stream().filter(e -> e.name.equals(name)).findFirst().orElse(null);
         if (this.currentEvent != null)
@@ -169,15 +179,17 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         this.wasDaytime = compound.getBoolean("was_daytime");
         for (LunarEvent event : this.lunarEvents)
             event.deserializeNBT(compound.getCompoundTag(event.name));
-        this.cachedMeteorPositions.clear();
-        NBTTagList meteors = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
-        for (int i = 0; i < meteors.tagCount(); i++)
-            this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) meteors.get(i)).getLong()));
-        this.playersPresentTicks.clear();
-        NBTTagList ticks = compound.getTagList("players_present_ticks", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < ticks.tagCount(); i++) {
-            NBTTagCompound comp = ticks.getCompoundTagAt(i);
-            this.playersPresentTicks.put(new ChunkPos(comp.getInteger("x"), comp.getInteger("z")), new MutableInt(comp.getInteger("ticks")));
+        if (!client) {
+            this.cachedMeteorPositions.clear();
+            NBTTagList meteors = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
+            for (int i = 0; i < meteors.tagCount(); i++)
+                this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) meteors.get(i)).getLong()));
+            this.playersPresentTicks.clear();
+            NBTTagList ticks = compound.getTagList("players_present_ticks", Constants.NBT.TAG_COMPOUND);
+            for (int i = 0; i < ticks.tagCount(); i++) {
+                NBTTagCompound comp = ticks.getCompoundTagAt(i);
+                this.playersPresentTicks.put(new ChunkPos(comp.getInteger("x"), comp.getInteger("z")), new MutableInt(comp.getInteger("ticks")));
+            }
         }
     }
 

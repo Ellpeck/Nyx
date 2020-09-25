@@ -20,7 +20,7 @@ public class PacketNyxWorld implements IMessage {
     private NBTTagCompound info;
 
     public PacketNyxWorld(NyxWorld world) {
-        this.info = world.serializeNBT();
+        this.info = world.serializeNBT(true);
     }
 
     public PacketNyxWorld() {
@@ -52,7 +52,7 @@ public class PacketNyxWorld implements IMessage {
                 if (world != null) {
                     NyxWorld nyx = NyxWorld.get(world);
                     if (nyx != null)
-                        nyx.deserializeNBT(message.info);
+                        nyx.deserializeNBT(message.info, true);
                 }
             });
 
