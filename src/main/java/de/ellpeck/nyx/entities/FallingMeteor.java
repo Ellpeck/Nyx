@@ -5,12 +5,17 @@ import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
@@ -37,8 +42,14 @@ public class FallingMeteor extends FallingStar {
                         continue;
                     this.world.setBlockState(affected, (this.world.rand.nextInt(5) == 0 ? Blocks.MAGMA : Registry.meteorRock).getDefaultState());
                 }
-                // TODO message to players in range
                 this.setDead();
+
+                // send "I spawned" message
+                ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".meteor").setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
+                for (EntityPlayer player : this.world.playerEntities) {
+                    if (player.getDistanceSq(this.posX, this.posY, this.posZ) <= 256 * 256)
+                        player.sendMessage(text);
+                }
             }
         } else {
             // TODO particles
