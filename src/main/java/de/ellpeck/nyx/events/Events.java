@@ -110,7 +110,7 @@ public final class Events {
 
         // Meteors
         meteors:
-        if (!event.world.isRemote && event.world.getTotalWorldTime() % 20 == 0) {
+        if (!event.world.isRemote && Config.meteors && event.world.getTotalWorldTime() % 20 == 0) {
             double chance = Config.getMeteorChance(event.world, data);
             if (!(event.world.rand.nextFloat() <= chance))
                 break meteors;
@@ -144,12 +144,14 @@ public final class Events {
         ChunkPos cp = chunk.getPos();
 
         // spawn meteors from the cache
-        List<BlockPos> meteors = data.cachedMeteorPositions.stream()
-                .filter(p -> p.getX() >= cp.getXStart() && p.getZ() >= cp.getZStart() && p.getX() <= cp.getXEnd() && p.getZ() <= cp.getZEnd())
-                .collect(Collectors.toList());
-        for (BlockPos pos : meteors)
-            FallingMeteor.spawn(data.world, pos);
-        data.cachedMeteorPositions.removeAll(meteors);
+        if (Config.meteors) {
+            List<BlockPos> meteors = data.cachedMeteorPositions.stream()
+                    .filter(p -> p.getX() >= cp.getXStart() && p.getZ() >= cp.getZStart() && p.getX() <= cp.getXEnd() && p.getZ() <= cp.getZEnd())
+                    .collect(Collectors.toList());
+            for (BlockPos pos : meteors)
+                FallingMeteor.spawn(data.world, pos);
+            data.cachedMeteorPositions.removeAll(meteors);
+        }
     }
 
     @SubscribeEvent

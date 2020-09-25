@@ -48,6 +48,7 @@ public final class Config {
     public static double meteorChanceStarShower;
     public static double meteorChanceEnd;
     public static int meteorSpawnRadius;
+    public static boolean meteors;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -88,6 +89,7 @@ public final class Config {
         bloodMoonSpawnRadius = instance.get("bloodMoon", "bloodMoonSpawnRadius", 20, "The closest distance that mobs can spawn away from a player during the blood moon. Vanilla value is 24.").getInt();
         bloodMoonOnFull = instance.get("bloodMoon", "bloodMoonOnFull", true, "If the blood moon should only occur on full moon nights").getBoolean();
 
+        meteors = instance.get("meteors", "meteors", true, "If meteor content should be enabled").getBoolean();
         meteorChance = instance.get("meteors", "meteorChance", 0.00014, "The chance of a meteor spawning every second, during the day").getDouble();
         meteorChanceNight = instance.get("meteors", "meteorChanceNight", 0.0024, "The chance of a meteor spawning every second, during nighttime").getDouble();
         meteorGateDimension = instance.get("meteors", "meteorGateDimension", "the_nether", "The dimension that needs to be entered to increase the spawning of meteors").getString();

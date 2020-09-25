@@ -70,6 +70,7 @@ public final class Registry {
     public static Block chiseledStarBlock;
     public static Block starStairs;
     public static Block starSlab;
+    public static Block meteorRock;
 
     public static Fluid lunarWaterFluid;
 
@@ -117,6 +118,8 @@ public final class Registry {
             reg.registerAll(slabs);
             starSlab = slabs[0];
         }
+        if (Config.meteors)
+            reg.register(meteorRock = initBlock(new MeteorRock(), "meteor_rock", ItemBlock::new));
     }
 
     @SubscribeEvent
@@ -143,7 +146,8 @@ public final class Registry {
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "cauldron_tracker"), CauldronTracker.class, Nyx.ID + ".cauldron_tracker", 0, Nyx.instance, 64, 20, false);
         if (Config.fallingStars)
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_star"), FallingStar.class, Nyx.ID + ".falling_star", 1, Nyx.instance, 128, 1, true);
-        EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_meteor"), FallingMeteor.class, Nyx.ID + ".falling_meteor", 2, Nyx.instance, 256, 1, true);
+        if (Config.meteors)
+            EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_meteor"), FallingMeteor.class, Nyx.ID + ".falling_meteor", 2, Nyx.instance, 256, 1, true);
 
         CapabilityManager.INSTANCE.register(NyxWorld.class, new Capability.IStorage<NyxWorld>() {
             @Nullable

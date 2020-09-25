@@ -33,10 +33,9 @@ public class FallingMeteor extends FallingStar {
                 for (BlockPos affected : exp.getAffectedBlockPositions()) {
                     if (!this.world.getBlockState(affected).getBlock().isReplaceable(this.world, affected) || !this.world.getBlockState(affected.down()).isFullBlock())
                         continue;
-                    if (this.world.rand.nextInt(3) != 0)
+                    if (this.world.rand.nextInt(2) != 0)
                         continue;
-                    // TODO replace with the meteor blocks
-                    this.world.setBlockState(affected, Blocks.MAGMA.getDefaultState());
+                    this.world.setBlockState(affected, (this.world.rand.nextInt(5) == 0 ? Blocks.MAGMA : Registry.meteorRock).getDefaultState());
                 }
                 // TODO message to players in range
                 this.setDead();
