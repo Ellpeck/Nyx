@@ -37,6 +37,10 @@ public class FallingMeteor extends FallingStar {
     @Override
     protected void customUpdate() {
         if (!this.world.isRemote) {
+            // falling into the void
+            if (this.posY <= -64)
+                this.setDead();
+
             if (this.collided) {
                 Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.size * 4, true);
                 for (BlockPos affected : exp.getAffectedBlockPositions()) {

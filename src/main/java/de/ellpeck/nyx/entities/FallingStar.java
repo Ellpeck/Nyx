@@ -44,7 +44,8 @@ public class FallingStar extends Entity {
     }
 
     protected void customUpdate() {
-        if (this.isEnteringUnloaded()) {
+        // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
+        if (!this.world.isAreaLoaded(this.getPosition(), 33, false)) {
             this.setDead();
             return;
         }
@@ -69,11 +70,6 @@ public class FallingStar extends Entity {
                 this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, true, this.posX, this.posY, this.posZ, mX, mY, mZ);
             }
         }
-    }
-
-    protected boolean isEnteringUnloaded() {
-        // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
-        return !this.world.isAreaLoaded(this.getPosition(), 33, false);
     }
 
     @Override
