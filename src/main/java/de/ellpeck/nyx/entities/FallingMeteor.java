@@ -129,7 +129,7 @@ public class FallingMeteor extends FallingStar {
     }
 
     public static FallingMeteor spawn(World world, BlockPos pos) {
-        pos = world.getHeight(pos).up(MathHelper.getInt(world.rand, 64, 96));
+        pos = world.getPrecipitationHeight(pos).up(MathHelper.getInt(world.rand, 64, 96));
         FallingMeteor meteor = new FallingMeteor(world);
         meteor.setPosition(pos.getX(), pos.getY(), pos.getZ());
         world.spawnEntity(meteor);

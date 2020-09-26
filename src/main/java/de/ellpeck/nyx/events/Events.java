@@ -100,7 +100,7 @@ public final class Events {
                     if (event.world.rand.nextFloat() > Config.fallingStarRarity * chanceMult)
                         continue;
                     BlockPos startPos = player.getPosition().add(event.world.rand.nextGaussian() * 20, 0, event.world.rand.nextGaussian() * 20);
-                    startPos = event.world.getHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));
+                    startPos = event.world.getPrecipitationHeight(startPos).up(MathHelper.getInt(event.world.rand, 32, 64));
 
                     FallingStar star = new FallingStar(event.world);
                     star.setPosition(startPos.getX(), startPos.getY(), startPos.getZ());
