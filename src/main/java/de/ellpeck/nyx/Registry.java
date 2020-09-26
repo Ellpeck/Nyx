@@ -81,6 +81,8 @@ public final class Registry {
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
     public static SoundEvent fallingStarImpactSound;
+    public static SoundEvent fallingMeteorSound;
+    public static SoundEvent fallingMeteorImpactSound;
 
     @SubscribeEvent
     public static void onEnchantmentRegistry(RegistryEvent.Register<Enchantment> event) {
@@ -137,7 +139,9 @@ public final class Registry {
         event.getRegistry().registerAll(
                 lunarWaterSound = new SoundEvent(new ResourceLocation(Nyx.ID, "lunar_water")).setRegistryName("lunar_water"),
                 fallingStarSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_star")).setRegistryName("falling_star"),
-                fallingStarImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_star_impact")).setRegistryName("falling_star_impact")
+                fallingStarImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_star_impact")).setRegistryName("falling_star_impact"),
+                fallingMeteorSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_meteor")).setRegistryName("falling_meteor"),
+                fallingMeteorImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_meteor_impact")).setRegistryName("falling_meteor_impact")
         );
     }
 

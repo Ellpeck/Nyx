@@ -10,5 +10,13 @@
     "falling_star_impact": {
         "category": "ambient",
         "sounds": ["nyx:falling_star_impact"]
+    },
+    "falling_meteor": {
+        "category": "ambient",
+        "sounds": ["nyx:falling_meteor"]
+    },
+    "falling_meteor_impact": {
+        "category": "ambient",
+        "sounds": ["nyx:falling_meteor_impact"]
     }
 }

@@ -6,14 +6,18 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.play.server.SPacketSoundEffect;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -63,9 +67,20 @@ public class FallingMeteor extends FallingStar {
                 // send "I spawned" message
                 ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".meteor").setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
                 for (EntityPlayer player : this.world.playerEntities) {
-                    if (player.getDistanceSq(this.posX, this.posY, this.posZ) <= 256 * 256)
+                    SoundEvent sound;
+                    if (player.getDistanceSq(this.posX, this.posY, this.posZ) <= 256 * 256) {
                         player.sendMessage(text);
+                        sound = SoundEvents.ENTITY_GENERIC_EXPLODE;
+                    } else {
+                        sound = Registry.fallingMeteorImpactSound;
+                    }
+                    if (player instanceof EntityPlayerMP && player.dimension == this.world.provider.getDimension())
+                        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSoundEffect(sound, SoundCategory.AMBIENT, player.posX, player.posY, player.posZ, 0.5F, 1));
                 }
+            } else {
+                if (this.world.getTotalWorldTime() % 35 == 0)
+                    this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingMeteorSound, SoundCategory.AMBIENT, 5, 1);
+
             }
         } else if (this.isLoaded()) {
             // we only want to display particles if we're loaded
