@@ -38,6 +38,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public final List<LunarEvent> lunarEvents = new ArrayList<>();
     public final Set<BlockPos> cachedMeteorPositions = new HashSet<>();
     public final Map<ChunkPos, MutableInt> playersPresentTicks = new HashMap<>();
+    public final Set<BlockPos> meteorLandingSites = new HashSet<>();
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
@@ -118,10 +119,8 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
                     isDirty = true;
                 }
 
-                if (isDirty) {
-                    for (EntityPlayer player : this.world.playerEntities)
-                        PacketHandler.sendTo(player, new PacketNyxWorld(this));
-                }
+                if (isDirty)
+                    this.sendToClients();
 
                 this.wasDaytime = isDaytime(this.world);
             } else {
@@ -136,6 +135,11 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         }
     }
 
+    public void sendToClients() {
+        for (EntityPlayer player : this.world.playerEntities)
+            PacketHandler.sendTo(player, new PacketNyxWorld(this));
+    }
+
     @Override
     public NBTTagCompound serializeNBT() {
         return this.serializeNBT(false);
@@ -148,11 +152,15 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         compound.setBoolean("was_daytime", this.wasDaytime);
         for (LunarEvent event : this.lunarEvents)
             compound.setTag(event.name, event.serializeNBT());
+        NBTTagList landings = new NBTTagList();
+        for (BlockPos pos : this.meteorLandingSites)
+            landings.appendTag(new NBTTagLong(pos.toLong()));
+        compound.setTag("meteor_landings", landings);
+        NBTTagList meteors = new NBTTagList();
+        for (BlockPos pos : this.cachedMeteorPositions)
+            meteors.appendTag(new NBTTagLong(pos.toLong()));
+        compound.setTag("cached_meteors", meteors);
         if (!client) {
-            NBTTagList meteors = new NBTTagList();
-            for (BlockPos pos : this.cachedMeteorPositions)
-                meteors.appendTag(new NBTTagLong(pos.toLong()));
-            compound.setTag("cached_meteors", meteors);
             NBTTagList ticks = new NBTTagList();
             for (Map.Entry<ChunkPos, MutableInt> e : this.playersPresentTicks.entrySet()) {
                 NBTTagCompound comp = new NBTTagCompound();
@@ -179,11 +187,15 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
         this.wasDaytime = compound.getBoolean("was_daytime");
         for (LunarEvent event : this.lunarEvents)
             event.deserializeNBT(compound.getCompoundTag(event.name));
+        this.meteorLandingSites.clear();
+        NBTTagList landings = compound.getTagList("meteor_landings", Constants.NBT.TAG_LONG);
+        for (int i = 0; i < landings.tagCount(); i++)
+            this.meteorLandingSites.add(BlockPos.fromLong(((NBTTagLong) landings.get(i)).getLong()));
+        this.cachedMeteorPositions.clear();
+        NBTTagList meteors = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
+        for (int i = 0; i < meteors.tagCount(); i++)
+            this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) meteors.get(i)).getLong()));
         if (!client) {
-            this.cachedMeteorPositions.clear();
-            NBTTagList meteors = compound.getTagList("cached_meteors", Constants.NBT.TAG_LONG);
-            for (int i = 0; i < meteors.tagCount(); i++)
-                this.cachedMeteorPositions.add(BlockPos.fromLong(((NBTTagLong) meteors.get(i)).getLong()));
             this.playersPresentTicks.clear();
             NBTTagList ticks = compound.getTagList("players_present_ticks", Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < ticks.tagCount(); i++) {

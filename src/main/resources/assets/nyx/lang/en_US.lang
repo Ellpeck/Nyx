@@ -27,6 +27,8 @@ fluid.nyx.lunar_water=Lunar Water
 item.nyx.lunar_water_bottle.name=Lunar Water Bottle
 item.nyx.comet_shard.name=Meteor Shard
 item.nyx.fallen_star.name=Fallen Star
+item.nyx.meteor_dust.name=Meteor Dust
+item.nyx.meteor_finder.name=Meteor Location Device
 
 command.nyx.force.usage=/nyxforce <event> to cause a lunar event to happen
 command.nyx.force.invalid=There is no lunar event with the name %s

@@ -129,6 +129,7 @@ public final class Events {
             if (!event.world.isBlockLoaded(spawnPos, false)) {
                 // add meteor information to cache
                 data.cachedMeteorPositions.add(spawnPos);
+                data.sendToClients();
             } else {
                 // spawn meteor entity
                 FallingMeteor.spawn(data.world, spawnPos);
@@ -155,6 +156,7 @@ public final class Events {
             for (BlockPos pos : meteors)
                 FallingMeteor.spawn(data.world, pos);
             data.cachedMeteorPositions.removeAll(meteors);
+            data.sendToClients();
         }
     }
 

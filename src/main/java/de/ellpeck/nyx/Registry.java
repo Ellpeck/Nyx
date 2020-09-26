@@ -10,6 +10,7 @@ import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.items.FallenStar;
 import de.ellpeck.nyx.items.ItemNyxSlab;
 import de.ellpeck.nyx.items.LunarWaterBottle;
+import de.ellpeck.nyx.items.MeteorFinder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.SoundType;
@@ -77,6 +78,8 @@ public final class Registry {
     public static Item lunarWaterBottle;
     public static Item cometShard;
     public static Item fallenStar;
+    public static Item meteorDust;
+    public static Item meteorFinder;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
@@ -129,6 +132,10 @@ public final class Registry {
         if (Config.lunarWater)
             lunarWaterBottle = new LunarWaterBottle();
         cometShard = initItem(new Item(), "comet_shard");
+        if (Config.meteors) {
+            meteorDust = initItem(new Item(), "meteor_dust");
+            meteorFinder = initItem(new MeteorFinder(), "meteor_finder");
+        }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");
         MOD_ITEMS.forEach(event.getRegistry()::register);

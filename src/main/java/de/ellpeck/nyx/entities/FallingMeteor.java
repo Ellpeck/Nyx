@@ -54,14 +54,21 @@ public class FallingMeteor extends FallingStar {
                 this.setDead();
 
             if (this.collided) {
+                NyxWorld data = NyxWorld.get(this.world);
                 Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.dataManager.get(SIZE) * 4, true);
                 for (BlockPos affected : exp.getAffectedBlockPositions()) {
                     if (!this.world.getBlockState(affected).getBlock().isReplaceable(this.world, affected) || !this.world.getBlockState(affected.down()).isFullBlock())
                         continue;
                     if (this.world.rand.nextInt(2) != 0)
                         continue;
-                    this.world.setBlockState(affected, (this.world.rand.nextInt(5) == 0 ? Blocks.MAGMA : Registry.meteorRock).getDefaultState());
+                    if (this.world.rand.nextInt(5) == 0) {
+                        this.world.setBlockState(affected, Blocks.MAGMA.getDefaultState());
+                    } else {
+                        this.world.setBlockState(affected, Registry.meteorRock.getDefaultState());
+                        data.meteorLandingSites.add(affected);
+                    }
                 }
+                data.sendToClients();
                 this.setDead();
 
                 // send "I spawned" message
