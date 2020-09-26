@@ -28,6 +28,8 @@ public class MeteorRenderer extends Render<FallingMeteor> {
 
     @Override
     public void doRender(FallingMeteor entity, double x, double y, double z, float entityYaw, float partialTicks) {
+        if (!entity.isLoaded())
+            return;
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         GlStateManager.disableLighting();

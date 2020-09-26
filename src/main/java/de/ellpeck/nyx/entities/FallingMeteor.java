@@ -67,8 +67,30 @@ public class FallingMeteor extends FallingStar {
                         player.sendMessage(text);
                 }
             }
-        } else {
-            // TODO particles
+        } else if (this.isLoaded()) {
+            // we only want to display particles if we're loaded
+            float size = this.dataManager.get(SIZE) / 2F + 1;
+            for (int i = 0; i < 60; i++) {
+                double x = this.posX + MathHelper.nextDouble(this.world.rand, -size, size);
+                double y = this.posY + MathHelper.nextDouble(this.world.rand, -size, size);
+                double z = this.posZ + MathHelper.nextDouble(this.world.rand, -size, size);
+                double mX = -this.motionX + this.world.rand.nextGaussian() * 0.02;
+                double mY = -this.motionY + this.world.rand.nextGaussian() * 0.02;
+                double mZ = -this.motionZ + this.world.rand.nextGaussian() * 0.02;
+
+                EnumParticleTypes type;
+                float f = this.world.rand.nextFloat();
+                if (f >= 0.65F) {
+                    type = EnumParticleTypes.FLAME;
+                } else if (f >= 0.45F) {
+                    type = EnumParticleTypes.LAVA;
+                } else if (f >= 0.3F) {
+                    type = EnumParticleTypes.SMOKE_NORMAL;
+                } else {
+                    type = EnumParticleTypes.SMOKE_LARGE;
+                }
+                this.world.spawnParticle(type, true, x, y, z, mX, mY, mZ);
+            }
         }
     }
 
