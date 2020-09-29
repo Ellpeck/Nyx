@@ -51,6 +51,7 @@ public final class Config {
     public static boolean meteors;
     public static int meteorDisallowRadius;
     public static int meteorDisallowTime;
+    public static Set<String> enchantingWhitelistDimensions;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -74,6 +75,7 @@ public final class Config {
         enchantments = instance.get("enchantments", "enchantments", true, "If the enchantments should be enabled").getBoolean();
         lunarEdgeXp = instance.get("enchantments", "lunarEdgeXp", true, "If a weapon enchanted with lunar edge should increase the experience drops of mobs").getBoolean();
         disallowDayEnchanting = instance.get("enchantments", "disallowDayEnchanting", true, "If enchanting should be disallowed during the day").getBoolean();
+        enchantingWhitelistDimensions = Sets.newHashSet(instance.get("enchantments", "enchantingWhitelistDimensions", new String[]{"the_nether", "the_end"}, "A list of names of dimensions where enchanting is always allowed, and not just at night").getStringList());
 
         harvestMoon = new LunarEventConfig("harvestMoon", "harvestMoon", "Harvest Moon", 0.05);
         harvestMoonOnFull = instance.get("harvestMoon", "harvestMoonOnFull", true, "If the harvest moon should only occur on full moon nights").getBoolean();

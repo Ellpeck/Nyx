@@ -310,6 +310,8 @@ public final class Events {
                 break ench;
             if (!(block instanceof BlockEnchantmentTable))
                 break ench;
+            if (Config.enchantingWhitelistDimensions.contains(world.provider.getDimensionType().getName()))
+                break ench;
             event.setUseBlock(Event.Result.DENY);
             player.sendStatusMessage(new TextComponentTranslation("info." + Nyx.ID + ".day_enchanting"), true);
         }
