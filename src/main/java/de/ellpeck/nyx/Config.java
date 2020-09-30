@@ -112,17 +112,18 @@ public final class Config {
     }
 
     public static double getMeteorChance(World world, NyxWorld data) {
-        // TODO nether gate to change the chance
-        if (world.provider.getDimensionType() == DimensionType.THE_END) {
-            return Config.meteorChanceEnd;
-        } else if (!NyxWorld.isDaytime(world)) {
+        if (world.provider.getDimensionType() == DimensionType.THE_END)
+            return meteorChanceEnd;
+
+        boolean visitedGate = data.visitedDimensions.contains(meteorGateDimension);
+        if (!NyxWorld.isDaytime(world)) {
             if (data.currentEvent instanceof StarShower) {
-                return Config.meteorChanceStarShower;
+                return meteorChanceStarShower;
             } else {
-                return Config.meteorChanceNight;
+                return visitedGate ? meteorChanceAfterGateNight : meteorChanceNight;
             }
         }
-        return Config.meteorChance;
+        return visitedGate ? meteorChanceAfterGate : meteorChance;
     }
 
     public static class LunarEventConfig {

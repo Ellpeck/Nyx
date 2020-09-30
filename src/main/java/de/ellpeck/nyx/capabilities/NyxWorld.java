@@ -8,9 +8,11 @@ import de.ellpeck.nyx.lunarevents.*;
 import de.ellpeck.nyx.network.PacketHandler;
 import de.ellpeck.nyx.network.PacketNyxWorld;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -39,6 +41,7 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     public final Set<BlockPos> cachedMeteorPositions = new HashSet<>();
     public final Map<ChunkPos, MutableInt> playersPresentTicks = new HashMap<>();
     public final Set<BlockPos> meteorLandingSites = new HashSet<>();
+    public final Set<String> visitedDimensions = new HashSet<>();
     public float eventSkyModifier;
     public int currentSkyColor;
     public LunarEvent currentEvent;
@@ -56,8 +59,14 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
     }
 
     public void update() {
-        // calculate which chunks have players close to them for meteor spawning
         if (!this.world.isRemote) {
+            // add to visited dimensions list
+            if (this.world.getTotalWorldTime() % 200 == 0) {
+                for (EntityPlayer player : this.world.getMinecraftServer().getPlayerList().getPlayers())
+                    this.visitedDimensions.add(player.world.provider.getDimensionType().getName());
+            }
+
+            // calculate which chunks have players close to them for meteor spawning
             int interval = 100;
             if (Config.meteors && this.world.getTotalWorldTime() % interval == 0) {
                 Set<ChunkPos> remaining = new HashSet<>(this.playersPresentTicks.keySet());
@@ -172,6 +181,10 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
                 ticks.appendTag(comp);
             }
             compound.setTag("players_present_ticks", ticks);
+            NBTTagList dimensions = new NBTTagList();
+            for (String dim : this.visitedDimensions)
+                dimensions.appendTag(new NBTTagString(dim));
+            compound.setTag("visited_dims", dimensions);
         }
         return compound;
     }
@@ -204,6 +217,10 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
                 NBTTagCompound comp = ticks.getCompoundTagAt(i);
                 this.playersPresentTicks.put(new ChunkPos(comp.getInteger("x"), comp.getInteger("z")), new MutableInt(comp.getInteger("ticks")));
             }
+            this.visitedDimensions.clear();
+            NBTTagList dimensions = compound.getTagList("visited_dims", Constants.NBT.TAG_STRING);
+            for (int i = 0; i < dimensions.tagCount(); i++)
+                this.visitedDimensions.add(((NBTTagString) dimensions.get(i)).getString());
         }
     }
 
