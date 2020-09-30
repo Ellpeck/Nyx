@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nyx:blocks/gleaning_meteor_rock"
+    }
+}

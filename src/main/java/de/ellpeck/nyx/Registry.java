@@ -72,6 +72,7 @@ public final class Registry {
     public static Block starStairs;
     public static Block starSlab;
     public static Block meteorRock;
+    public static Block gleaningMeteorRock;
 
     public static Fluid lunarWaterFluid;
 
@@ -80,6 +81,7 @@ public final class Registry {
     public static Item fallenStar;
     public static Item meteorDust;
     public static Item meteorFinder;
+    public static Item unrefinedCrystal;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
@@ -123,8 +125,10 @@ public final class Registry {
             reg.registerAll(slabs);
             starSlab = slabs[0];
         }
-        if (Config.meteors)
-            reg.register(meteorRock = initBlock(new MeteorRock(), "meteor_rock", ItemBlock::new));
+        if (Config.meteors) {
+            reg.register(meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new));
+            reg.register(gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new));
+        }
     }
 
     @SubscribeEvent
@@ -135,6 +139,7 @@ public final class Registry {
         if (Config.meteors) {
             meteorDust = initItem(new Item(), "meteor_dust");
             meteorFinder = initItem(new MeteorFinder(), "meteor_finder");
+            unrefinedCrystal = initItem(new Item(), "unrefined_crystal");
         }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");

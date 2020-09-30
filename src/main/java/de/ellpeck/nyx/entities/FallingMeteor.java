@@ -3,6 +3,8 @@ package de.ellpeck.nyx.entities;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
+import de.ellpeck.nyx.lunarevents.HarvestMoon;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -78,7 +80,11 @@ public class FallingMeteor extends FallingStar {
                     if (this.world.rand.nextInt(5) == 0) {
                         this.world.setBlockState(affected, Blocks.MAGMA.getDefaultState());
                     } else {
-                        this.world.setBlockState(affected, Registry.meteorRock.getDefaultState());
+                        if (data.currentEvent instanceof HarvestMoon && this.world.rand.nextInt(10) == 0) {
+                            this.world.setBlockState(affected, Registry.gleaningMeteorRock.getDefaultState());
+                        } else {
+                            this.world.setBlockState(affected, Registry.meteorRock.getDefaultState());
+                        }
                         data.meteorLandingSites.add(affected);
                     }
                 }

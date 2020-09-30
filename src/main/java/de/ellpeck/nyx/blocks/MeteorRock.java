@@ -12,10 +12,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class MeteorRock extends Block {
-    public MeteorRock() {
+
+    private final Supplier<Item> droppedItem;
+
+    public MeteorRock(Supplier<Item> droppedItem) {
         super(Material.ROCK);
+        this.droppedItem = droppedItem;
+
         this.setHarvestLevel("pickaxe", 3);
         this.setHardness(40);
         this.setResistance(3000);
@@ -34,6 +40,6 @@ public class MeteorRock extends Block {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return Registry.cometShard;
+        return this.droppedItem.get();
     }
 }
