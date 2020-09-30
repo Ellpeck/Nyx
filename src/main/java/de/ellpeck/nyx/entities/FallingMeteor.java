@@ -20,6 +20,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -30,6 +31,7 @@ import net.minecraft.world.World;
 public class FallingMeteor extends FallingStar {
 
     public static final DataParameter<Integer> SIZE = EntityDataManager.createKey(FallingMeteor.class, DataSerializers.VARINT);
+    public boolean homing;
 
     public FallingMeteor(World worldIn) {
         super(worldIn);
@@ -52,6 +54,18 @@ public class FallingMeteor extends FallingStar {
             // falling into the void
             if (this.posY <= -64)
                 this.setDead();
+
+            // move towards the closest player if we're homing
+            if (this.homing) {
+                EntityPlayer player = this.world.getClosestPlayer(this.posX, this.posY, this.posZ, 128, false);
+                if (player != null && player.getDistanceSq(this) >= 32 * 32) {
+                    Vec3d motion = new Vec3d(player.posX - this.posX, player.posY - this.posY, player.posZ - this.posZ);
+                    motion = motion.normalize();
+                    this.trajectoryX = (float) motion.x * 2F;
+                    this.trajectoryY = (float) motion.y * 2F;
+                    this.trajectoryZ = (float) motion.z * 2F;
+                }
+            }
 
             if (this.collided) {
                 NyxWorld data = NyxWorld.get(this.world);
@@ -120,12 +134,14 @@ public class FallingMeteor extends FallingStar {
     protected void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
         compound.setInteger("size", this.dataManager.get(SIZE));
+        compound.setBoolean("homing", this.homing);
     }
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
         this.dataManager.set(SIZE, compound.getInteger("size"));
+        this.homing = compound.getBoolean("homing");
     }
 
     public static FallingMeteor spawn(World world, BlockPos pos) {

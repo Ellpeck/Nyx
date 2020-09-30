@@ -34,5 +34,5 @@ command.nyx.force.usage=/nyxforce <event> to cause a lunar event to happen
 command.nyx.force.invalid=There is no lunar event with the name %s
 command.nyx.force.success=%s will occur on the next possible night
 command.nyx.force.clear=Forced event was cleared
-command.nyx.meteor.usage=/nyxmeteor [<x> <z> <size>] to spawn a meteor
+command.nyx.meteor.usage=/nyxmeteor [x z] [size] [homing] to spawn a meteor
 command.nyx.meteor.success=Spawned a meteor at %s, %s, %s
