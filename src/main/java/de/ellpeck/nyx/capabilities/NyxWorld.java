@@ -108,9 +108,11 @@ public class NyxWorld implements ICapabilityProvider, INBTSerializable<NBTTagCom
                     }
                     if (this.currentEvent != null) {
                         isDirty = true;
-                        ITextComponent text = this.currentEvent.getStartMessage();
-                        for (EntityPlayer player : this.world.playerEntities)
-                            player.sendMessage(text);
+                        if (Config.eventNotifications) {
+                            ITextComponent text = this.currentEvent.getStartMessage();
+                            for (EntityPlayer player : this.world.playerEntities)
+                                player.sendMessage(text);
+                        }
                     }
                 }
 

@@ -52,6 +52,7 @@ public final class Config {
     public static int meteorDisallowRadius;
     public static int meteorDisallowTime;
     public static Set<String> enchantingWhitelistDimensions;
+    public static boolean eventNotifications;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -67,6 +68,7 @@ public final class Config {
         isMobDuplicationWhitelist = instance.get("general", "isMobDuplicationWhitelist", false, "If the mobDuplicationBlacklist should act as a whitelist instead").getBoolean();
         moonEventTint = instance.get("general", "moonEventTint", true, "If moon events should tint the sky").getBoolean();
         lunarWaterTicks = instance.get("general", "lunarWaterTicks", new int[]{1200, -1, 4800, 4800, 3600, 3600, 2400, 2400, 600, -1}, "The amount of ticks that a cauldron of water must be exposed to the night sky to be ready to turn into lunar water, per moon phase. From first to last, the entries are: Full moon, new moon, waning crescent, waxing crescent, third quarter, first quarter, waning gibbous, waxing gibbous, harvest moon and blood moon. Set any entry to -1 to disable lunar water production for that phase.").getIntList();
+        eventNotifications = instance.get("general", "eventNotifications", true, "If moon events should be announced in chat when they start").getBoolean();
 
         fullMoon = instance.get("fullMoon", "fullMoon", true, "If the vanilla full moon should be considered a proper lunar event").getBoolean();
         addPotionEffects = instance.get("fullMoon", "addPotionEffects", true, "If mobs spawned during a full moon should have random potion effects applied to them (similarly to spiders in the base game)").getBoolean();
