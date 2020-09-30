@@ -22,6 +22,7 @@ tile.nyx.star_stairs.name=Star Block Stairs
 tile.nyx.star_slab.name=Star Block Slab
 tile.nyx.star_slab_double.name=Star Block Double Slab
 tile.nyx.gleaning_meteor_rock.name=Gleaning Meteor Cluster
+tile.nyx.crystal.name=Gleaning Crystal
 
 fluid.nyx.lunar_water=Lunar Water
 

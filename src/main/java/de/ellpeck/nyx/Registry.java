@@ -73,6 +73,7 @@ public final class Registry {
     public static Block starSlab;
     public static Block meteorRock;
     public static Block gleaningMeteorRock;
+    public static Block crystal;
 
     public static Fluid lunarWaterFluid;
 
@@ -126,8 +127,11 @@ public final class Registry {
             starSlab = slabs[0];
         }
         if (Config.meteors) {
-            reg.register(meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new));
-            reg.register(gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new));
+            reg.registerAll(
+                    meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new),
+                    gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new),
+                    crystal = initBlock(new Crystal(), "crystal", ItemBlock::new)
+            );
         }
     }
 
@@ -183,6 +187,8 @@ public final class Registry {
     public static void init() {
         if (Config.fallingStars)
             GameRegistry.addSmelting(new ItemStack(starBlock), new ItemStack(crackedStarBlock), 0.1F);
+        if (Config.meteors)
+            GameRegistry.addSmelting(new ItemStack(unrefinedCrystal), new ItemStack(crystal), 0.25F);
     }
 
     public static Item initItem(Item item, String name) {
