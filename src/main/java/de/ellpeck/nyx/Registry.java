@@ -130,7 +130,7 @@ public final class Registry {
             reg.registerAll(
                     meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new),
                     gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new),
-                    crystal = initBlock(new Crystal(), "crystal", ItemBlock::new)
+                    crystal = new Crystal()
             );
         }
     }
