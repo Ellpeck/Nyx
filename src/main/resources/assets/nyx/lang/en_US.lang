@@ -32,6 +32,8 @@ item.nyx.fallen_star.name=Fallen Star
 item.nyx.meteor_dust.name=Meteor Dust
 item.nyx.meteor_finder.name=Meteor Location Device
 item.nyx.unrefined_crystal.name=Unrefined Gleaning Crystal
+item.nyx.scythe.name=Gleaning Scythe
+item.nyx.meteor_ingot.name=Meteor Ingot
 
 command.nyx.force.usage=/nyxforce <event> to cause a lunar event to happen
 command.nyx.force.invalid=There is no lunar event with the name %s

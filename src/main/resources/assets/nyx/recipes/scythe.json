@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " CC",
+        "C I",
+        "  I"
+    ],
+    "key": {
+        "C": {
+            "item": "nyx:crystal"
+        },
+        "I": {
+            "item": "nyx:meteor_ingot"
+        }
+    },
+    "result": {
+        "item": "nyx:scythe"
+    }
+}

@@ -7,10 +7,7 @@ import de.ellpeck.nyx.enchantments.LunarShield;
 import de.ellpeck.nyx.entities.CauldronTracker;
 import de.ellpeck.nyx.entities.FallingMeteor;
 import de.ellpeck.nyx.entities.FallingStar;
-import de.ellpeck.nyx.items.FallenStar;
-import de.ellpeck.nyx.items.ItemNyxSlab;
-import de.ellpeck.nyx.items.LunarWaterBottle;
-import de.ellpeck.nyx.items.MeteorFinder;
+import de.ellpeck.nyx.items.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.SoundType;
@@ -83,6 +80,8 @@ public final class Registry {
     public static Item meteorDust;
     public static Item meteorFinder;
     public static Item unrefinedCrystal;
+    public static Item scythe;
+    public static Item meteorIngot;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
@@ -144,6 +143,8 @@ public final class Registry {
             meteorDust = initItem(new Item(), "meteor_dust");
             meteorFinder = initItem(new MeteorFinder(), "meteor_finder");
             unrefinedCrystal = initItem(new Item(), "unrefined_crystal");
+            scythe = initItem(new Scythe(), "scythe");
+            meteorIngot = initItem(new Item(), "meteor_ingot");
         }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");
@@ -187,8 +188,10 @@ public final class Registry {
     public static void init() {
         if (Config.fallingStars)
             GameRegistry.addSmelting(new ItemStack(starBlock), new ItemStack(crackedStarBlock), 0.1F);
-        if (Config.meteors)
+        if (Config.meteors) {
             GameRegistry.addSmelting(new ItemStack(unrefinedCrystal), new ItemStack(crystal), 0.25F);
+            GameRegistry.addSmelting(new ItemStack(cometShard), new ItemStack(meteorIngot), 0.15F);
+        }
     }
 
     public static Item initItem(Item item, String name) {
