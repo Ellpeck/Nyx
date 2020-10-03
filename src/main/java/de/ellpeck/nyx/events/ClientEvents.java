@@ -47,24 +47,6 @@ public final class ClientEvents {
     private static String lastMoonTextures;
 
     @SubscribeEvent
-    public static void onTooltip(ItemTooltipEvent event) {
-        ItemStack stack = event.getItemStack();
-        List<String> tooltip = event.getToolTip();
-        for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
-            Enchantment enchantment = entry.getKey();
-            if (!(enchantment instanceof NyxEnchantment))
-                continue;
-            String name = enchantment.getTranslatedName(entry.getValue());
-            int addIndex = tooltip.indexOf(name) + 1;
-
-            String info = I18n.format(enchantment.getName() + ".desc");
-            List<String> split = Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(info, 200);
-            for (int i = split.size() - 1; i >= 0; i--)
-                tooltip.add(addIndex, TextFormatting.DARK_GRAY + split.get(i));
-        }
-    }
-
-    @SubscribeEvent
     public static void onDebug(RenderGameOverlayEvent.Text event) {
         Minecraft mc = Minecraft.getMinecraft();
         if (!mc.gameSettings.showDebugInfo)
