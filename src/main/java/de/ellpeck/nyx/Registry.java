@@ -82,6 +82,7 @@ public final class Registry {
     public static Item unrefinedCrystal;
     public static Item scythe;
     public static Item meteorIngot;
+    public static Item meteorBow;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
@@ -145,6 +146,7 @@ public final class Registry {
             unrefinedCrystal = initItem(new Item(), "unrefined_crystal");
             scythe = initItem(new Scythe(), "scythe");
             meteorIngot = initItem(new Item(), "meteor_ingot");
+            meteorBow = initItem(new Bow(), "meteor_bow");
         }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");

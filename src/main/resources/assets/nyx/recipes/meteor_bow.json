@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "DDD",
+        "LBM",
+        "DDD"
+    ],
+    "key": {
+        "B": {
+            "item": "minecraft:bow"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        },
+        "M": {
+            "item": "minecraft:magma_cream"
+        },
+        "D": {
+            "item": "nyx:meteor_dust"
+        }
+    },
+    "result": {
+        "item": "nyx:meteor_bow"
+    }
+}
