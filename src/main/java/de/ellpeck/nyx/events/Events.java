@@ -1,5 +1,7 @@
 package de.ellpeck.nyx.events;
 
+import com.google.common.collect.Streams;
+import com.google.common.eventbus.Subscribe;
 import de.ellpeck.nyx.Config;
 import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
@@ -20,10 +22,10 @@ import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityElderGuardian;
@@ -34,7 +36,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumActionResult;
@@ -54,10 +58,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -75,12 +76,54 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = Nyx.ID)
 public final class Events {
 
     private static final Method SET_SLIME_SIZE_METHOD = ObfuscationReflectionHelper.findMethod(EntitySlime.class, "func_70799_a", void.class, int.class, boolean.class);
+    private static final AttributeModifier METEOR_MOVEMENT_MODIFIER = new AttributeModifier(UUID.fromString("c1f96acc-e117-4dc1-a351-e295a5de6071"), Nyx.ID + ":meteor_movement_speed", -0.15F, 2); // 2 is multiply total
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        // meteor armor speed reduction
+        if (Config.meteors) {
+            EntityPlayer player = event.player;
+            if (player.world.getTotalWorldTime() % 20 != 0)
+                return;
+            IAttributeInstance speed = player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
+            String key = Nyx.ID + ":meteor_equipped";
+            NBTTagCompound nbt = player.getEntityData();
+            // do we have 2 or more pieces equipped?
+            boolean equipped = Streams.stream(player.getArmorInventoryList())
+                    .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
+                    .count() >= 2;
+            if (equipped && !nbt.getBoolean(key)) {
+                // we just equipped it
+                nbt.setBoolean(key, true);
+                if (!speed.hasModifier(METEOR_MOVEMENT_MODIFIER))
+                    speed.applyModifier(METEOR_MOVEMENT_MODIFIER);
+            } else if (!equipped && nbt.getBoolean(key)) {
+                // we just unequipped it
+                nbt.setBoolean(key, false);
+                speed.removeModifier(METEOR_MOVEMENT_MODIFIER);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onDamage(LivingDamageEvent event) {
+        // meteor armor explosion resistance
+        if (Config.meteors) {
+            if (!event.getSource().isExplosion())
+                return;
+            int equipped = (int) Streams.stream(event.getEntityLiving().getArmorInventoryList())
+                    .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
+                    .count();
+            event.setAmount(event.getAmount() * (1 - 0.1F * equipped));
+        }
+    }
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
