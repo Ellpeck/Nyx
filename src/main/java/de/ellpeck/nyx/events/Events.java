@@ -37,14 +37,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemShield;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -59,6 +57,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -122,6 +121,41 @@ public final class Events {
                     .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
                     .count();
             event.setAmount(event.getAmount() * (1 - 0.1F * equipped));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCriticalHit(CriticalHitEvent event) {
+        // meteor sword stunning
+        if (Config.meteors) {
+            ItemStack sword = event.getEntityLiving().getHeldItemMainhand();
+            if (sword.getItem() != Registry.meteorSword)
+                return;
+            Entity target = event.getTarget();
+            if (target instanceof EntityLivingBase)
+                ((EntityLivingBase) target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 15, 10));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onAttack(LivingAttackEvent event) {
+        // meteor axe shield damage
+        if (Config.meteors) {
+            Entity attacker = event.getSource().getTrueSource();
+            if (!(attacker instanceof EntityLivingBase))
+                return;
+            ItemStack weapon = ((EntityLivingBase) attacker).getHeldItemMainhand();
+            if (weapon.getItem() != Registry.meteorAxe)
+                return;
+            EntityLivingBase target = event.getEntityLiving();
+            if (!(target instanceof EntityPlayer))
+                return;
+            EntityPlayer player = (EntityPlayer) target;
+            if (!player.isHandActive())
+                return;
+            ItemStack active = player.getActiveItemStack();
+            if (active.getItem() instanceof ItemShield)
+                active.damageItem(13, player);
         }
     }
 
