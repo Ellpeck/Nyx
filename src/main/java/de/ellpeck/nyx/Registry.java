@@ -14,9 +14,9 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
@@ -25,6 +25,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -83,12 +84,24 @@ public final class Registry {
     public static Item scythe;
     public static Item meteorIngot;
     public static Item meteorBow;
+    public static Item meteorPickaxe;
+    public static Item meteorAxe;
+    public static Item meteorShovel;
+    public static Item meteorHoe;
+    public static Item meteorSword;
+    public static Item meteorHelm;
+    public static Item meteorChest;
+    public static Item meteorPants;
+    public static Item meteorBoots;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
     public static SoundEvent fallingStarImpactSound;
     public static SoundEvent fallingMeteorSound;
     public static SoundEvent fallingMeteorImpactSound;
+
+    public static Item.ToolMaterial meteorToolMaterial;
+    public static ItemArmor.ArmorMaterial meteorArmorMaterial;
 
     @SubscribeEvent
     public static void onEnchantmentRegistry(RegistryEvent.Register<Enchantment> event) {
@@ -147,6 +160,15 @@ public final class Registry {
             scythe = initItem(new Scythe(), "scythe");
             meteorIngot = initItem(new Item(), "meteor_ingot");
             meteorBow = initItem(new Bow(), "meteor_bow");
+            meteorPickaxe = initItem(new Pickaxe(meteorToolMaterial), "meteor_pickaxe");
+            meteorAxe = initItem(new Axe(meteorToolMaterial, 12, -3.2F), "meteor_axe");
+            meteorShovel = initItem(new ItemSpade(meteorToolMaterial), "meteor_shovel");
+            meteorHoe = initItem(new ItemHoe(meteorToolMaterial), "meteor_hoe");
+            meteorSword = initItem(new ItemSword(meteorToolMaterial), "meteor_sword");
+            meteorHelm = initItem(new ItemArmor(meteorArmorMaterial, 0, EntityEquipmentSlot.HEAD), "meteor_helm");
+            meteorChest = initItem(new ItemArmor(meteorArmorMaterial, 1, EntityEquipmentSlot.CHEST), "meteor_chest");
+            meteorPants = initItem(new ItemArmor(meteorArmorMaterial, 2, EntityEquipmentSlot.LEGS), "meteor_pants");
+            meteorBoots = initItem(new ItemArmor(meteorArmorMaterial, 3, EntityEquipmentSlot.FEET), "meteor_boots");
         }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");
@@ -169,8 +191,11 @@ public final class Registry {
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "cauldron_tracker"), CauldronTracker.class, Nyx.ID + ".cauldron_tracker", 0, Nyx.instance, 64, 20, false);
         if (Config.fallingStars)
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_star"), FallingStar.class, Nyx.ID + ".falling_star", 1, Nyx.instance, 128, 1, true);
-        if (Config.meteors)
+        if (Config.meteors) {
             EntityRegistry.registerModEntity(new ResourceLocation(Nyx.ID, "falling_meteor"), FallingMeteor.class, Nyx.ID + ".falling_meteor", 2, Nyx.instance, 256, 1, true);
+            meteorToolMaterial = EnumHelper.addToolMaterial("NYX:METEOR", 3, (int) (1561 * 1.5F), 7, 7, 18);
+            meteorArmorMaterial = EnumHelper.addArmorMaterial("NYX:METEOR", Nyx.ID + ":meteor", (int) (33 * 1.5F), new int[]{4, 8, 10, 4}, 18, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 3);
+        }
 
         CapabilityManager.INSTANCE.register(NyxWorld.class, new Capability.IStorage<NyxWorld>() {
             @Nullable
