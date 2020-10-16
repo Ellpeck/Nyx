@@ -133,7 +133,7 @@ public final class Events {
                 return;
             Entity target = event.getTarget();
             if (target instanceof EntityLivingBase)
-                ((EntityLivingBase) target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 15, 10));
+                ((EntityLivingBase) target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 15, 10, false, false));
         }
     }
 
