@@ -36,6 +36,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemShield;
 import net.minecraft.item.ItemStack;
@@ -86,37 +87,64 @@ public final class Events {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        // meteor armor speed reduction
+        if (event.phase != TickEvent.Phase.END)
+            return;
         if (Config.meteors) {
             EntityPlayer player = event.player;
-            if (player.world.getTotalWorldTime() % 20 != 0)
-                return;
-            IAttributeInstance speed = player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
-            String key = Nyx.ID + ":meteor_equipped";
-            NBTTagCompound nbt = player.getEntityData();
-            // do we have 2 or more pieces equipped?
-            boolean equipped = Streams.stream(player.getArmorInventoryList())
-                    .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
-                    .count() >= 2;
-            if (equipped && !nbt.getBoolean(key)) {
-                // we just equipped it
-                nbt.setBoolean(key, true);
-                if (!speed.hasModifier(METEOR_MOVEMENT_MODIFIER))
-                    speed.applyModifier(METEOR_MOVEMENT_MODIFIER);
-            } else if (!equipped && nbt.getBoolean(key)) {
-                // we just unequipped it
-                nbt.setBoolean(key, false);
-                speed.removeModifier(METEOR_MOVEMENT_MODIFIER);
+            // meteor armor speed reduction
+            if (player.world.getTotalWorldTime() % 20 == 0) {
+                IAttributeInstance speed = player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
+                String key = Nyx.ID + ":meteor_equipped";
+                NBTTagCompound nbt = player.getEntityData();
+                // do we have 2 or more pieces equipped?
+                boolean equipped = Streams.stream(player.getArmorInventoryList())
+                        .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
+                        .count() >= 2;
+                if (equipped && !nbt.getBoolean(key)) {
+                    // we just equipped it
+                    nbt.setBoolean(key, true);
+                    if (!speed.hasModifier(METEOR_MOVEMENT_MODIFIER))
+                        speed.applyModifier(METEOR_MOVEMENT_MODIFIER);
+                } else if (!equipped && nbt.getBoolean(key)) {
+                    // we just unequipped it
+                    nbt.setBoolean(key, false);
+                    speed.removeModifier(METEOR_MOVEMENT_MODIFIER);
+                }
+            }
+            // meteor hammer ability executions
+            // we check fall distance because we need the player to be done falling when removing the tag
+            if (player.onGround && player.fallDistance <= 0 && player.getEntityData().hasKey(Nyx.ID + ":leap_start")) {
+                if (!player.world.isRemote) {
+                    long leapTime = player.world.getTotalWorldTime() - player.getEntityData().getLong(Nyx.ID + ":leap_start");
+                    if (leapTime >= 5) {
+                        int r = 3;
+                        AxisAlignedBB area = new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r);
+                        DamageSource source = DamageSource.causePlayerDamage(player);
+                        for (EntityLivingBase entity : player.world.getEntitiesWithinAABB(EntityLivingBase.class, area, EntitySelectors.IS_ALIVE)) {
+                            if (entity == player)
+                                continue;
+                            entity.attackEntityFrom(source, 15);
+                            entity.motionY = 1;
+                        }
+                        player.world.playSound(null, player.getPosition(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 1);
+                    }
+                }
+                player.getEntityData().removeTag(Nyx.ID + ":leap_start");
             }
         }
     }
 
     @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        // meteor hammer ability
+        if (Config.meteors && event.getEntityLiving().getEntityData().hasKey(Nyx.ID + ":leap_start"))
+            event.setDamageMultiplier(0);
+    }
+
+    @SubscribeEvent
     public static void onDamage(LivingDamageEvent event) {
         // meteor armor explosion resistance
-        if (Config.meteors) {
-            if (!event.getSource().isExplosion())
-                return;
+        if (Config.meteors && event.getSource().isExplosion()) {
             int equipped = (int) Streams.stream(event.getEntityLiving().getArmorInventoryList())
                     .filter(s -> s.getItem() instanceof ItemArmor && ((ItemArmor) s.getItem()).getArmorMaterial() == Registry.meteorArmorMaterial)
                     .count();

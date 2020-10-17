@@ -44,6 +44,7 @@ item.nyx.meteor_helm.name=Meteor Helmet
 item.nyx.meteor_chest.name=Meteor Chestplate
 item.nyx.meteor_pants.name=Meteor Leggings
 item.nyx.meteor_boots.name=Meteor Boots
+item.nyx.meteor_hammer.name=Meteor Hammer
 
 command.nyx.force.usage=/nyxforce <event> to cause a lunar event to happen
 command.nyx.force.invalid=There is no lunar event with the name %s

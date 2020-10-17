@@ -93,6 +93,7 @@ public final class Registry {
     public static Item meteorChest;
     public static Item meteorPants;
     public static Item meteorBoots;
+    public static Item meteorHammer;
 
     public static SoundEvent lunarWaterSound;
     public static SoundEvent fallingStarSound;
@@ -169,6 +170,7 @@ public final class Registry {
             meteorChest = initItem(new ItemArmor(meteorArmorMaterial, 1, EntityEquipmentSlot.CHEST), "meteor_chest");
             meteorPants = initItem(new ItemArmor(meteorArmorMaterial, 2, EntityEquipmentSlot.LEGS), "meteor_pants");
             meteorBoots = initItem(new ItemArmor(meteorArmorMaterial, 3, EntityEquipmentSlot.FEET), "meteor_boots");
+            meteorHammer = initItem(new Hammer(meteorToolMaterial), "meteor_hammer");
         }
         if (Config.fallingStars)
             fallenStar = initItem(new FallenStar(), "fallen_star");

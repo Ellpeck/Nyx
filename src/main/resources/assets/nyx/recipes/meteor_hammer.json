@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "BBB",
+        "MSM",
+        "LSL"
+    ],
+    "key": {
+        "S": {
+            "item": "minecraft:stick"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        },
+        "M": {
+            "item": "nyx:meteor_dust"
+        },
+        "B": {
+            "item": "nyx:meteor_block"
+        }
+    },
+    "result": {
+        "item": "nyx:meteor_hammer"
+    }
+}

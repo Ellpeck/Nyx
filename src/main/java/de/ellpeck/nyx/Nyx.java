@@ -3,10 +3,11 @@ package de.ellpeck.nyx;
 import de.ellpeck.nyx.commands.CommandForce;
 import de.ellpeck.nyx.commands.CommandMeteor;
 import de.ellpeck.nyx.network.PacketHandler;
-import net.minecraftforge.common.config.Configuration;
+import de.ellpeck.nyx.proxy.CommonProxy;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -20,6 +21,8 @@ public class Nyx {
 
     @Mod.Instance
     public static Nyx instance;
+    @SidedProxy(clientSide = "de.ellpeck.nyx.proxy.ClientProxy", serverSide = "de.ellpeck.nyx.proxy.CommonProxy")
+    public static CommonProxy proxy;
 
     static {
         FluidRegistry.enableUniversalBucket();
