@@ -229,7 +229,7 @@ public final class Events {
             MutableInt ticksInArea = data.playersPresentTicks.get(new ChunkPos(spawnPos));
             if (ticksInArea != null && ticksInArea.intValue() >= Config.meteorDisallowTime)
                 chance /= Math.pow(2, ticksInArea.intValue() / (double) Config.meteorDisallowTime);
-            if (!(event.world.rand.nextFloat() <= chance))
+            if (chance <= 0 || !(event.world.rand.nextFloat() <= chance))
                 break meteors;
             if (!event.world.isBlockLoaded(spawnPos, false)) {
                 // add meteor information to cache

@@ -114,9 +114,12 @@ public final class Config {
     }
 
     public static double getMeteorChance(World world, NyxWorld data) {
-        if (world.provider.getDimensionType() == DimensionType.THE_END)
+        DimensionType dim = world.provider.getDimensionType();
+        if (dim == DimensionType.THE_END)
             return meteorChanceEnd;
 
+        if (!Config.allowedDimensions.contains(dim.getName()))
+            return 0;
         boolean visitedGate = data.visitedDimensions.contains(meteorGateDimension);
         if (!NyxWorld.isDaytime(world)) {
             if (data.currentEvent instanceof StarShower) {
