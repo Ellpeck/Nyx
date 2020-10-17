@@ -9,7 +9,6 @@ import de.ellpeck.nyx.entities.FallingMeteor;
 import de.ellpeck.nyx.entities.FallingStar;
 import de.ellpeck.nyx.items.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockStairs;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,7 +16,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.*;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -36,12 +34,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = Nyx.ID)
 public final class Registry {
@@ -72,6 +67,8 @@ public final class Registry {
     public static Block meteorRock;
     public static Block gleaningMeteorRock;
     public static Block crystal;
+    public static Block meteorBlock;
+    public static Block meteorGlass;
 
     public static Fluid lunarWaterFluid;
 
@@ -144,7 +141,9 @@ public final class Registry {
             reg.registerAll(
                     meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new),
                     gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new),
-                    crystal = new Crystal()
+                    crystal = new Crystal(),
+                    meteorBlock = initBlock(new Block(Material.ROCK).setHardness(3), "meteor_block", ItemBlock::new),
+                    meteorGlass = initBlock(new Glass().setHardness(5).setResistance(3000), "meteor_glass", ItemBlock::new)
             );
         }
     }
@@ -220,6 +219,7 @@ public final class Registry {
         if (Config.meteors) {
             GameRegistry.addSmelting(new ItemStack(unrefinedCrystal), new ItemStack(crystal), 0.25F);
             GameRegistry.addSmelting(new ItemStack(cometShard), new ItemStack(meteorIngot), 0.15F);
+            GameRegistry.addSmelting(new ItemStack(meteorDust), new ItemStack(meteorGlass), 0.1F);
         }
     }
 
