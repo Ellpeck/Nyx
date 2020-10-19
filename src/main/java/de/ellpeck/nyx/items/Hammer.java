@@ -37,8 +37,13 @@ public class Hammer extends Pickaxe {
 
     @Override
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
+        if (!entityLiving.onGround)
+            return;
         int useTime = this.getMaxItemUseDuration(stack) - timeLeft;
         if (useTime < 20)
+            return;
+        // we have to be looking up
+        if (entityLiving.rotationPitch > -10)
             return;
         float modifier = MathHelper.clamp((useTime - 20) / 5F, 1, 2.5F);
         entityLiving.motionX += -modifier * MathHelper.sin(entityLiving.rotationYaw * 0.017453292F);

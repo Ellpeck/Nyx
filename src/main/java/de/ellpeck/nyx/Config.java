@@ -54,6 +54,7 @@ public final class Config {
     public static Set<String> enchantingWhitelistDimensions;
     public static boolean eventNotifications;
     public static int crystalDurability;
+    public static int hammerDamage;
 
     public static void init(File file) {
         instance = new Configuration(file);
@@ -108,6 +109,7 @@ public final class Config {
         meteorDisallowRadius = instance.get("meteors", "meteorDisallowRadius", 16, "The radius in chunks that should be marked as invalid for meteor spawning around each player").getInt();
         meteorDisallowTime = instance.get("meteors", "meteorDisallowTime", 12000, "The amount of ticks that need to pass for each player until the chance of a meteor spawning in the area is halved (and then halved again, and so on)").getInt();
         crystalDurability = instance.get("meteors", "crystalDurability", 1000, "The amount of uses that a gleaning crystal should have for bone-mealing").getInt();
+        hammerDamage = instance.get("meteors", "hammerDamage", 15, "The amount of damage that the meteor hammer deals if the maximum flight time was used").getInt();
 
         if (instance.hasChanged())
             instance.save();

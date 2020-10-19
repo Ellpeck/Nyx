@@ -120,10 +120,11 @@ public final class Events {
                         int r = 3;
                         AxisAlignedBB area = new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r);
                         DamageSource source = DamageSource.causePlayerDamage(player);
+                        float damage = Config.hammerDamage * Math.min((leapTime - 5) / 35F, 1);
                         for (EntityLivingBase entity : player.world.getEntitiesWithinAABB(EntityLivingBase.class, area, EntitySelectors.IS_ALIVE)) {
                             if (entity == player)
                                 continue;
-                            entity.attackEntityFrom(source, 15);
+                            entity.attackEntityFrom(source, damage);
                             entity.motionY = 1;
                         }
                         player.world.playSound(null, player.getPosition(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 1);
