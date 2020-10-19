@@ -34,6 +34,7 @@ public class FallingMeteor extends FallingStar {
 
     public static final DataParameter<Integer> SIZE = EntityDataManager.createKey(FallingMeteor.class, DataSerializers.VARINT);
     public boolean homing;
+    public boolean disableMessage;
 
     public FallingMeteor(World worldIn) {
         super(worldIn);
@@ -92,17 +93,21 @@ public class FallingMeteor extends FallingStar {
                 this.setDead();
 
                 // send "I spawned" message
-                ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".meteor").setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
-                for (EntityPlayer player : this.world.playerEntities) {
-                    SoundEvent sound;
-                    if (player.getDistanceSq(this.posX, this.posY, this.posZ) <= 256 * 256) {
-                        player.sendMessage(text);
-                        sound = SoundEvents.ENTITY_GENERIC_EXPLODE;
-                    } else {
-                        sound = Registry.fallingMeteorImpactSound;
+                if (!this.disableMessage) {
+                    ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".meteor").setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
+                    for (EntityPlayer player : this.world.playerEntities) {
+                        SoundEvent sound;
+                        double dist = player.getDistanceSq(this.posX, this.posY, this.posZ);
+                        if (dist <= 256 * 256) {
+                            if (dist > 16 * 16)
+                                player.sendMessage(text);
+                            sound = SoundEvents.ENTITY_GENERIC_EXPLODE;
+                        } else {
+                            sound = Registry.fallingMeteorImpactSound;
+                        }
+                        if (player instanceof EntityPlayerMP && player.dimension == this.world.provider.getDimension())
+                            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSoundEffect(sound, SoundCategory.AMBIENT, player.posX, player.posY, player.posZ, 0.5F, 1));
                     }
-                    if (player instanceof EntityPlayerMP && player.dimension == this.world.provider.getDimension())
-                        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSoundEffect(sound, SoundCategory.AMBIENT, player.posX, player.posY, player.posZ, 0.5F, 1));
                 }
             } else {
                 if (this.world.getTotalWorldTime() % 35 == 0)
@@ -141,6 +146,7 @@ public class FallingMeteor extends FallingStar {
         super.writeEntityToNBT(compound);
         compound.setInteger("size", this.dataManager.get(SIZE));
         compound.setBoolean("homing", this.homing);
+        compound.setBoolean("disable_message", this.disableMessage);
     }
 
     @Override
@@ -148,6 +154,7 @@ public class FallingMeteor extends FallingStar {
         super.readEntityFromNBT(compound);
         this.dataManager.set(SIZE, compound.getInteger("size"));
         this.homing = compound.getBoolean("homing");
+        this.disableMessage = compound.getBoolean("disable_message");
     }
 
     public static FallingMeteor spawn(World world, BlockPos pos) {
