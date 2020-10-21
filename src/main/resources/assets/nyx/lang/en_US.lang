@@ -25,6 +25,7 @@ tile.nyx.gleaning_meteor_rock.name=Gleaning Meteor Cluster
 tile.nyx.crystal.name=Gleaning Crystal
 tile.nyx.meteor_block.name=Block of Meteor
 tile.nyx.meteor_glass.name=Meteoric Glass
+tile.nyx.meteor_rock.name=Meteoric Rock
 
 fluid.nyx.lunar_water=Lunar Water
 
