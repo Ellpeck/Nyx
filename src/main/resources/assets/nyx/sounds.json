@@ -18,5 +18,13 @@
     "falling_meteor_impact": {
         "category": "ambient",
         "sounds": ["nyx:falling_meteor_impact"]
+    },
+    "hammer_start": {
+        "category": "player",
+        "sounds": ["nyx:hammer_start"]
+    },
+    "hammer_end": {
+        "category": "player",
+        "sounds": ["nyx:hammer_end"]
     }
 }

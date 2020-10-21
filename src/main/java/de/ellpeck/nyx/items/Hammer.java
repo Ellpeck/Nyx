@@ -1,6 +1,7 @@
 package de.ellpeck.nyx.items;
 
 import de.ellpeck.nyx.Nyx;
+import de.ellpeck.nyx.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -10,15 +11,13 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeHooks;
 
 public class Hammer extends Pickaxe {
@@ -50,6 +49,11 @@ public class Hammer extends Pickaxe {
         entityLiving.motionY += 0.625 * modifier;
         entityLiving.motionZ += modifier * MathHelper.cos(entityLiving.rotationYaw * 0.017453292F);
         entityLiving.getEntityData().setLong(Nyx.ID + ":leap_start", worldIn.getTotalWorldTime());
+
+        if (!worldIn.isRemote) {
+            worldIn.playSound(null, entityLiving.getPosition(), Registry.hammerStartSound, SoundCategory.PLAYERS, 1, 1);
+            ((WorldServer) worldIn).spawnParticle(EnumParticleTypes.FLAME, false, entityLiving.posX, entityLiving.posY + entityLiving.getEyeHeight(), entityLiving.posZ, 30, 0.25, 0.25, 0.25, 0.05);
+        }
     }
 
     @Override

@@ -127,7 +127,7 @@ public final class Events {
                             entity.attackEntityFrom(source, damage);
                             entity.motionY = 1;
                         }
-                        player.world.playSound(null, player.getPosition(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 1);
+                        player.world.playSound(null, player.getPosition(), Registry.hammerEndSound, SoundCategory.PLAYERS, 1, 1);
                     }
                 }
                 player.getEntityData().removeTag(Nyx.ID + ":leap_start");

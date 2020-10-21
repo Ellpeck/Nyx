@@ -97,6 +97,8 @@ public final class Registry {
     public static SoundEvent fallingStarImpactSound;
     public static SoundEvent fallingMeteorSound;
     public static SoundEvent fallingMeteorImpactSound;
+    public static SoundEvent hammerStartSound;
+    public static SoundEvent hammerEndSound;
 
     public static Item.ToolMaterial meteorToolMaterial;
     public static ItemArmor.ArmorMaterial meteorArmorMaterial;
@@ -183,8 +185,9 @@ public final class Registry {
                 fallingStarSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_star")).setRegistryName("falling_star"),
                 fallingStarImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_star_impact")).setRegistryName("falling_star_impact"),
                 fallingMeteorSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_meteor")).setRegistryName("falling_meteor"),
-                fallingMeteorImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_meteor_impact")).setRegistryName("falling_meteor_impact")
-        );
+                fallingMeteorImpactSound = new SoundEvent(new ResourceLocation(Nyx.ID, "falling_meteor_impact")).setRegistryName("falling_meteor_impact"),
+                hammerStartSound = new SoundEvent(new ResourceLocation(Nyx.ID, "hammer_start")).setRegistryName("hammer_start"),
+                hammerEndSound = new SoundEvent(new ResourceLocation(Nyx.ID, "hammer_end")).setRegistryName("hammer_end"));
     }
 
     public static void preInit() {
