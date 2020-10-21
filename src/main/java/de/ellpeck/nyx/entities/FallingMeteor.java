@@ -4,15 +4,11 @@ import de.ellpeck.nyx.Nyx;
 import de.ellpeck.nyx.Registry;
 import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -37,6 +33,7 @@ public class FallingMeteor extends FallingStar {
     public boolean homing;
     public boolean disableMessage;
     public float speedModifier;
+    public boolean spawnNoBlocks;
 
     public FallingMeteor(World worldIn) {
         super(worldIn);
@@ -96,20 +93,22 @@ public class FallingMeteor extends FallingStar {
 
                 NyxWorld data = NyxWorld.get(this.world);
                 Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.dataManager.get(SIZE) * 4, true);
-                for (BlockPos affected : exp.getAffectedBlockPositions()) {
-                    if (!this.world.getBlockState(affected).getBlock().isReplaceable(this.world, affected) || !this.world.getBlockState(affected.down()).isFullBlock())
-                        continue;
-                    if (this.world.rand.nextInt(2) != 0)
-                        continue;
-                    if (this.world.rand.nextInt(5) == 0) {
-                        this.world.setBlockState(affected, Blocks.MAGMA.getDefaultState());
-                    } else {
-                        if (data.currentEvent instanceof HarvestMoon && this.world.rand.nextInt(10) == 0) {
-                            this.world.setBlockState(affected, Registry.gleaningMeteorRock.getDefaultState());
+                if (!this.spawnNoBlocks) {
+                    for (BlockPos affected : exp.getAffectedBlockPositions()) {
+                        if (!this.world.getBlockState(affected).getBlock().isReplaceable(this.world, affected) || !this.world.getBlockState(affected.down()).isFullBlock())
+                            continue;
+                        if (this.world.rand.nextInt(2) != 0)
+                            continue;
+                        if (this.world.rand.nextInt(5) == 0) {
+                            this.world.setBlockState(affected, Blocks.MAGMA.getDefaultState());
                         } else {
-                            this.world.setBlockState(affected, Registry.meteorRock.getDefaultState());
+                            if (data.currentEvent instanceof HarvestMoon && this.world.rand.nextInt(10) == 0) {
+                                this.world.setBlockState(affected, Registry.gleaningMeteorRock.getDefaultState());
+                            } else {
+                                this.world.setBlockState(affected, Registry.meteorRock.getDefaultState());
+                            }
+                            data.meteorLandingSites.add(affected);
                         }
-                        data.meteorLandingSites.add(affected);
                     }
                 }
                 data.sendToClients();
@@ -173,6 +172,7 @@ public class FallingMeteor extends FallingStar {
         compound.setBoolean("homing", this.homing);
         compound.setBoolean("disable_message", this.disableMessage);
         compound.setFloat("speed", this.speedModifier);
+        compound.setBoolean("spawn_no_blocks", this.spawnNoBlocks);
     }
 
     @Override
@@ -182,6 +182,7 @@ public class FallingMeteor extends FallingStar {
         this.homing = compound.getBoolean("homing");
         this.disableMessage = compound.getBoolean("disable_message");
         this.speedModifier = compound.getFloat("speed");
+        this.spawnNoBlocks = compound.getBoolean("spawn_no_blocks");
     }
 
     private boolean removeTrees(BlockPos pos) {
