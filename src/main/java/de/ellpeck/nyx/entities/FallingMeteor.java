@@ -35,11 +35,12 @@ public class FallingMeteor extends FallingStar {
     public static final DataParameter<Integer> SIZE = EntityDataManager.createKey(FallingMeteor.class, DataSerializers.VARINT);
     public boolean homing;
     public boolean disableMessage;
+    public float speedModifier;
 
     public FallingMeteor(World worldIn) {
         super(worldIn);
         this.dataManager.set(SIZE, worldIn.rand.nextInt(3) + 1);
-        this.initTrajectory(2);
+        this.initTrajectory(2 * this.speedModifier);
     }
 
     @Override
@@ -53,8 +54,10 @@ public class FallingMeteor extends FallingStar {
         // init some stuff that /summon wouldn't have
         if (this.dataManager.get(SIZE) <= 0)
             this.dataManager.set(SIZE, 2);
+        if (this.speedModifier <= 0)
+            this.speedModifier = 1;
         if (this.trajectoryX == 0 && this.trajectoryY == 0 && this.trajectoryZ == 0)
-            this.initTrajectory(2);
+            this.initTrajectory(2 * this.speedModifier);
     }
 
     @Override
@@ -78,10 +81,10 @@ public class FallingMeteor extends FallingStar {
                 if (player != null && player.getDistanceSq(this) >= 32 * 32) {
                     Vec3d motion = new Vec3d(player.posX - this.posX, player.posY - this.posY, player.posZ - this.posZ);
                     motion = motion.normalize();
-                    this.trajectoryX = (float) motion.x * 2F;
+                    this.trajectoryX = (float) motion.x * 2 * this.speedModifier;
                     if (motion.y < 0)
-                        this.trajectoryY = (float) motion.y * 2F;
-                    this.trajectoryZ = (float) motion.z * 2F;
+                        this.trajectoryY = (float) motion.y * 2 * this.speedModifier;
+                    this.trajectoryZ = (float) motion.z * 2 * this.speedModifier;
                 }
             }
 
@@ -165,6 +168,7 @@ public class FallingMeteor extends FallingStar {
         compound.setInteger("size", this.dataManager.get(SIZE));
         compound.setBoolean("homing", this.homing);
         compound.setBoolean("disable_message", this.disableMessage);
+        compound.setFloat("speed", this.speedModifier);
     }
 
     @Override
@@ -173,6 +177,7 @@ public class FallingMeteor extends FallingStar {
         this.dataManager.set(SIZE, compound.getInteger("size"));
         this.homing = compound.getBoolean("homing");
         this.disableMessage = compound.getBoolean("disable_message");
+        this.speedModifier = compound.getFloat("speed");
     }
 
     public static FallingMeteor spawn(World world, BlockPos pos) {
