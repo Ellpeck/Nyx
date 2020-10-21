@@ -97,16 +97,19 @@ public class FallingMeteor extends FallingStar {
                     ITextComponent text = new TextComponentTranslation("info." + Nyx.ID + ".meteor").setStyle(new Style().setColor(TextFormatting.GRAY).setItalic(true));
                     for (EntityPlayer player : this.world.playerEntities) {
                         SoundEvent sound;
+                        float pitch;
                         double dist = player.getDistanceSq(this.posX, this.posY, this.posZ);
                         if (dist <= 256 * 256) {
                             if (dist > 16 * 16)
                                 player.sendMessage(text);
                             sound = SoundEvents.ENTITY_GENERIC_EXPLODE;
+                            pitch = 0.15F;
                         } else {
                             sound = Registry.fallingMeteorImpactSound;
+                            pitch = 1;
                         }
                         if (player instanceof EntityPlayerMP && player.dimension == this.world.provider.getDimension())
-                            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSoundEffect(sound, SoundCategory.AMBIENT, player.posX, player.posY, player.posZ, 0.5F, 1));
+                            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSoundEffect(sound, SoundCategory.AMBIENT, player.posX, player.posY, player.posZ, 0.5F, pitch));
                     }
                 }
             } else {
