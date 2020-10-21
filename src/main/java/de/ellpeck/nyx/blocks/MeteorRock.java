@@ -12,8 +12,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -52,5 +55,17 @@ public class MeteorRock extends Block {
         if (!entityIn.isImmuneToFire() && entityIn instanceof EntityLivingBase && !EnchantmentHelper.hasFrostWalkerEnchantment((EntityLivingBase) entityIn))
             entityIn.attackEntityFrom(DamageSource.HOT_FLOOR, 1);
         super.onEntityWalk(worldIn, pos, entityIn);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+        for (int i = 0; i < 3; i++) {
+            boolean side = rand.nextBoolean();
+            float x = side ? rand.nextFloat() : rand.nextBoolean() ? 1 : 0;
+            float z = !side ? rand.nextFloat() : rand.nextBoolean() ? 1 : 0;
+            float y = rand.nextBoolean() ? 1 : 0;
+            worldIn.spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH, pos.getX() + x, pos.getY() + y, pos.getZ() + z, 0, 0, 0);
+        }
     }
 }
