@@ -6,6 +6,7 @@ import de.ellpeck.nyx.capabilities.NyxWorld;
 import de.ellpeck.nyx.lunarevents.HarvestMoon;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -89,6 +90,10 @@ public class FallingMeteor extends FallingStar {
             }
 
             if (this.collided) {
+                // if we removed trees, we want to continue flying after until we hit the ground
+                if (this.removeTrees(this.getPosition()))
+                    return;
+
                 NyxWorld data = NyxWorld.get(this.world);
                 Explosion exp = this.world.createExplosion(null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.dataManager.get(SIZE) * 4, true);
                 for (BlockPos affected : exp.getAffectedBlockPositions()) {
@@ -133,7 +138,6 @@ public class FallingMeteor extends FallingStar {
             } else {
                 if (this.world.getTotalWorldTime() % 35 == 0)
                     this.world.playSound(null, this.posX, this.posY, this.posZ, Registry.fallingMeteorSound, SoundCategory.AMBIENT, 5, 1);
-
             }
         } else if (this.isLoaded()) {
             // we only want to display particles if we're loaded
@@ -178,6 +182,26 @@ public class FallingMeteor extends FallingStar {
         this.homing = compound.getBoolean("homing");
         this.disableMessage = compound.getBoolean("disable_message");
         this.speedModifier = compound.getFloat("speed");
+    }
+
+    private boolean removeTrees(BlockPos pos) {
+        boolean any = false;
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos offset = pos.add(x, y, z);
+                    if (offset.distanceSq(this.posX, this.posY, this.posZ) >= 8 * 8)
+                        continue;
+                    IBlockState state = this.world.getBlockState(offset);
+                    if (!state.getBlock().isLeaves(state, this.world, offset) && !state.getBlock().isWood(this.world, offset))
+                        continue;
+                    this.world.setBlockToAir(offset);
+                    this.removeTrees(offset);
+                    any = true;
+                }
+            }
+        }
+        return any;
     }
 
     public static FallingMeteor spawn(World world, BlockPos pos) {
