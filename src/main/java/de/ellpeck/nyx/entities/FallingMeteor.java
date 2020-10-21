@@ -39,16 +39,30 @@ public class FallingMeteor extends FallingStar {
     public FallingMeteor(World worldIn) {
         super(worldIn);
         this.dataManager.set(SIZE, worldIn.rand.nextInt(3) + 1);
-
-        // meteor should be faster than falling star
-        this.trajectoryX *= 2;
-        this.trajectoryY *= 2;
-        this.trajectoryZ *= 2;
+        this.initTrajectory(2);
     }
 
     @Override
     protected void entityInit() {
         this.dataManager.register(SIZE, 1);
+    }
+
+    @Override
+    public void onAddedToWorld() {
+        super.onAddedToWorld();
+        // init some stuff that /summon wouldn't have
+        if (this.dataManager.get(SIZE) <= 0)
+            this.dataManager.set(SIZE, 2);
+        if (this.trajectoryX == 0 && this.trajectoryY == 0 && this.trajectoryZ == 0)
+            this.initTrajectory(2);
+    }
+
+    @Override
+    public void setLocationAndAngles(double x, double y, double z, float yaw, float pitch) {
+        // homing meteors should spawn higher up
+        if (this.homing)
+            y += 48;
+        super.setLocationAndAngles(x, y, z, yaw, pitch);
     }
 
     @Override
@@ -65,7 +79,8 @@ public class FallingMeteor extends FallingStar {
                     Vec3d motion = new Vec3d(player.posX - this.posX, player.posY - this.posY, player.posZ - this.posZ);
                     motion = motion.normalize();
                     this.trajectoryX = (float) motion.x * 2F;
-                    this.trajectoryY = (float) motion.y * 2F;
+                    if (motion.y < 0)
+                        this.trajectoryY = (float) motion.y * 2F;
                     this.trajectoryZ = (float) motion.z * 2F;
                 }
             }

@@ -25,14 +25,7 @@ public class FallingStar extends Entity {
     public FallingStar(World worldIn) {
         super(worldIn);
         this.setEntityBoundingBox(null);
-
-        this.trajectoryX = MathHelper.nextFloat(this.world.rand, 0.5F, 1.25F);
-        if (this.world.rand.nextBoolean())
-            this.trajectoryX *= -1;
-        this.trajectoryY = MathHelper.nextFloat(this.world.rand, -0.5F, -0.85F);
-        this.trajectoryZ = MathHelper.nextFloat(this.world.rand, 0.5F, 1.25F);
-        if (this.world.rand.nextBoolean())
-            this.trajectoryZ *= -1;
+        this.initTrajectory(1);
     }
 
     @Override
@@ -74,6 +67,16 @@ public class FallingStar extends Entity {
     protected boolean isLoaded() {
         // entities are only updated if they're at least 32 blocks away from unloaded chunks (for some reason)
         return this.world.isAreaLoaded(this.getPosition(), 34, false);
+    }
+
+    protected void initTrajectory(float multiplier) {
+        this.trajectoryX = MathHelper.nextFloat(this.world.rand, 0.5F, 1.25F) * multiplier;
+        if (this.world.rand.nextBoolean())
+            this.trajectoryX *= -1;
+        this.trajectoryY = MathHelper.nextFloat(this.world.rand, -0.5F, -0.85F) * multiplier;
+        this.trajectoryZ = MathHelper.nextFloat(this.world.rand, 0.5F, 1.25F) * multiplier;
+        if (this.world.rand.nextBoolean())
+            this.trajectoryZ *= -1;
     }
 
     @Override
