@@ -21,7 +21,7 @@ public final class Config {
     public static int additionalMobsChance;
     public static boolean lunarEdgeXp;
     public static boolean disallowDayEnchanting;
-    public static double cometShardGuardianChance;
+    public static double meteorShardGuardianChance;
     public static boolean fallingStars;
     public static double fallingStarRarity;
     public static boolean fullMoon;
@@ -65,7 +65,7 @@ public final class Config {
     public static void load() {
         allowedDimensions = Sets.newHashSet(instance.get("general", "allowedDimensions", new String[]{"overworld"}, "Names of the dimensions that lunar events should occur in").getStringList());
         lunarWater = instance.get("general", "lunarWater", true, "If lunar water should be enabled").getBoolean();
-        cometShardGuardianChance = instance.get("general", "cometShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a comet shard to be dropped from an elder guardian", 0, 1).getDouble();
+        meteorShardGuardianChance = instance.get("general", "meteorShardGuardianChance", 0.05, "The chance in percent (1 = 100%) for a meteor shard to be dropped from an elder guardian", 0, 1).getDouble();
         mobDuplicationBlacklist = Sets.newHashSet(instance.get("general", "mobDuplicationBlacklist", new String[0], "The registry names of entities that should not be spawned during the full and blood moons. If isMobDuplicationWhitelist is true, this acts as a whitelist instead.").getStringList());
         isMobDuplicationWhitelist = instance.get("general", "isMobDuplicationWhitelist", false, "If the mobDuplicationBlacklist should act as a whitelist instead").getBoolean();
         moonEventTint = instance.get("general", "moonEventTint", true, "If moon events should tint the sky").getBoolean();

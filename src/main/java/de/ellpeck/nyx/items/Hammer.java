@@ -51,7 +51,7 @@ public class Hammer extends Pickaxe {
         entityLiving.getEntityData().setLong(Nyx.ID + ":leap_start", worldIn.getTotalWorldTime());
 
         if (!worldIn.isRemote) {
-            worldIn.playSound(null, entityLiving.getPosition(), Registry.hammerStartSound, SoundCategory.PLAYERS, 1, 1);
+            worldIn.playSound(null, entityLiving.getPosition(), Registry.hammerStartSound, SoundCategory.PLAYERS, 0.5F, 1);
             ((WorldServer) worldIn).spawnParticle(EnumParticleTypes.FLAME, false, entityLiving.posX, entityLiving.posY + entityLiving.getEyeHeight(), entityLiving.posZ, 30, 0.25, 0.25, 0.25, 0.05);
         }
     }

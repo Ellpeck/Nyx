@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "nyx:items/comet_shard"
+        "layer0": "nyx:items/meteor_shard"
     }
 }

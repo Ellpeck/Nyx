@@ -73,7 +73,7 @@ public final class Registry {
     public static Fluid lunarWaterFluid;
 
     public static Item lunarWaterBottle;
-    public static Item cometShard;
+    public static Item meteorShard;
     public static Item fallenStar;
     public static Item meteorDust;
     public static Item meteorFinder;
@@ -141,7 +141,7 @@ public final class Registry {
         }
         if (Config.meteors) {
             reg.registerAll(
-                    meteorRock = initBlock(new MeteorRock(() -> cometShard), "meteor_rock", ItemBlock::new),
+                    meteorRock = initBlock(new MeteorRock(() -> meteorShard), "meteor_rock", ItemBlock::new),
                     gleaningMeteorRock = initBlock(new MeteorRock(() -> unrefinedCrystal), "gleaning_meteor_rock", ItemBlock::new),
                     crystal = new Crystal(),
                     meteorBlock = initBlock(new Block(Material.ROCK).setHardness(3), "meteor_block", ItemBlock::new),
@@ -154,7 +154,7 @@ public final class Registry {
     public static void onItemRegistry(RegistryEvent.Register<Item> event) {
         if (Config.lunarWater)
             lunarWaterBottle = new LunarWaterBottle();
-        cometShard = initItem(new Item(), "comet_shard");
+        meteorShard = initItem(new Item(), "meteor_shard");
         if (Config.meteors) {
             meteorDust = initItem(new Item(), "meteor_dust");
             meteorFinder = initItem(new MeteorFinder(), "meteor_finder");
@@ -221,7 +221,7 @@ public final class Registry {
             GameRegistry.addSmelting(new ItemStack(starBlock), new ItemStack(crackedStarBlock), 0.1F);
         if (Config.meteors) {
             GameRegistry.addSmelting(new ItemStack(unrefinedCrystal), new ItemStack(crystal), 0.25F);
-            GameRegistry.addSmelting(new ItemStack(cometShard), new ItemStack(meteorIngot), 0.15F);
+            GameRegistry.addSmelting(new ItemStack(meteorShard), new ItemStack(meteorIngot), 0.15F);
             GameRegistry.addSmelting(new ItemStack(meteorDust), new ItemStack(meteorGlass), 0.1F);
         }
     }

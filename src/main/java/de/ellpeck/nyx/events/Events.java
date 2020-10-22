@@ -162,7 +162,7 @@ public final class Events {
                 return;
             Entity target = event.getTarget();
             if (target instanceof EntityLivingBase)
-                ((EntityLivingBase) target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 15, 10, false, false));
+                ((EntityLivingBase) target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 30, 10, true, false));
         }
     }
 
@@ -315,8 +315,8 @@ public final class Events {
     public static void onEntityDrop(LivingDropsEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
         List<EntityItem> drops = event.getDrops();
-        if (entity instanceof EntityElderGuardian && !entity.world.isRemote && entity.world.rand.nextDouble() <= Config.cometShardGuardianChance) {
-            ItemStack stack = new ItemStack(Registry.cometShard, (event.getLootingLevel() / 2) + 1);
+        if (entity instanceof EntityElderGuardian && !entity.world.isRemote && entity.world.rand.nextDouble() <= Config.meteorShardGuardianChance) {
+            ItemStack stack = new ItemStack(Registry.meteorShard, (event.getLootingLevel() / 2) + 1);
             drops.add(new EntityItem(entity.world, entity.posX, entity.posY, entity.posZ, stack));
         }
     }
