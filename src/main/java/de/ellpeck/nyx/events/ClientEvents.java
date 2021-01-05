@@ -112,7 +112,8 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onColorRegistry(ColorHandlerEvent.Item event) {
-        event.getItemColors().registerItemColorHandler((stack, tintIndex) -> 0xd44a13, Registry.meteorFinder);
+        if (Config.meteors)
+            event.getItemColors().registerItemColorHandler((stack, tintIndex) -> 0xd44a13, Registry.meteorFinder);
     }
 
     // Just stole this fluid stuff from Actually Additions lol
